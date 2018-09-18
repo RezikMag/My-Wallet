@@ -1,5 +1,6 @@
 package com.rezikmag.mywallet;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -19,6 +20,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+
+import com.rezikmag.mywallet.Database.AppDataBase;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -29,10 +33,12 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ActionBarDrawerToggle mDrawerToggle;
 
+    private static AppDataBase mDb;
 
-    ViewPager pager;
+    Button mAddButon;
+
+    static ViewPager pager;
     PagerAdapter pagerAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +46,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        pager = (ViewPager) findViewById(R.id.pager);
+        mAddButon = findViewById(R.id.add_balance);
+        mDb = AppDataBase.getInstanse(getApplicationContext());
 
         configureNavigationDrawer();
         configureToolbar();
 
-        pager = (ViewPager) findViewById(R.id.pager);
+
+
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
@@ -67,17 +77,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-    }
+        mAddButon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
+                intent.putExtra( "addIncome",pagerAdapter.getPageTitle(pager.getCurrentItem()));
+//                intent.putExtra("time", )
+//                 startActivityForResult(intent, 1234);
+           startActivity(intent);
+            }
+        });
 
-
-
-
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-// Синхронизировать состояние выключателя после onRestoreInstanceState.
-        mDrawerToggle.syncState();
     }
 
     @Override
@@ -86,6 +96,42 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        if (mDrawerToggle.onOptionsItemSelected(item)){
+            return true;
+        }
+        switch(itemId) {
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+// Синхронизировать состояние выключателя после onRestoreInstanceState.
+        mDrawerToggle.syncState();
+    }
+
+
+
+
+    private void configureNavigationDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navView = (NavigationView) findViewById(R.id.navigation);
+
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setChecked(true);
+//                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
+    }
     private void configureToolbar() {
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -115,35 +161,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+/*
+   @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) return;
+        int amount = data.getIntExtra("income",0);
+        Log.d("Tag",""+ amount);
 
-    private void configureNavigationDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navView = (NavigationView) findViewById(R.id.navigation);
-
-        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                item.setChecked(true);
-//                mDrawerLayout.closeDrawers();
-                return true;
-            }
-        });
-
+        pagerAdapter.incomeList.set(pager.getCurrentItem(),amount);
+        pagerAdapter.getItem(pager.getCurrentItem());
+        pagerAdapter.notifyDataSetChanged();
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-
-        if (mDrawerToggle.onOptionsItemSelected(item)){
-            return true;
-        }
-        switch(itemId) {
-
-
-         }
-        return super.onOptionsItemSelected(item);
-    }
-
-
+    */
 }

@@ -1,7 +1,6 @@
 package com.rezikmag.mywallet;
 
 
-import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,7 +15,8 @@ import android.widget.TextView;
 public class PageFragment extends Fragment {
 
     static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
-    int pageNumber;
+    static final String ARGUMENT_INCOME = "income";
+//    int pageNumber;
 
 
     public PageFragment() {
@@ -31,8 +31,11 @@ public class PageFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_page,container ,false);
 
-        TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
+        TextView tvPage = (TextView) view.findViewById(R.id.tv_page);
         tvPage.setText("Page"+ getArguments().getInt(ARGUMENT_PAGE_NUMBER));
+
+        TextView tvIncome = (TextView) view.findViewById(R.id.tv_income);
+        tvIncome.setText("Income: " + getArguments().getInt(ARGUMENT_INCOME));
         // Inflate the layout for this fragment
         return view;
     }
