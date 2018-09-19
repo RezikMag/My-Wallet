@@ -17,7 +17,9 @@ import java.util.ArrayList;
 public class PageFragment extends Fragment {
 
     static final String ARGUMENT_TOTAL_INCOME = "income";
-    static final String ARGUMENT_INCOME = "one income";
+    static final String ARGUMENT_TRANSACTION_INCOME = "transaction income";
+    static final String ARGUMENT_TOTAL_EXPENSES = "expenses";
+    static final String ARGUMENT_TRANSACTION_EXPENSES ="transaction expenses";
 
     public PageFragment() {
         // Required empty public constructor
@@ -33,8 +35,16 @@ public class PageFragment extends Fragment {
         TextView tvTotalIncome = (TextView) view.findViewById(R.id.tv_total_income);
         tvTotalIncome.setText("Income: " + getArguments().getInt(ARGUMENT_TOTAL_INCOME)+ " Rub.");
 
+        TextView tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
+        tvTotalExpenses.setText("Expenses: "+ getArguments().getInt(ARGUMENT_TOTAL_EXPENSES) + " Rub.");
+
+
         TextView tvListIncome = (TextView) view.findViewById(R.id.tv_list_income);
-        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_INCOME);
+        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
+
+        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
+        ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
+
         StringBuffer incomeList = new StringBuffer();
         if (listIncome!=null && listIncome.size()>0) {
             for (int a : listIncome) {
@@ -42,7 +52,16 @@ public class PageFragment extends Fragment {
             }
             tvListIncome.setText(incomeList.toString());
         }
-        return view;
+
+        StringBuffer expensesList = new StringBuffer();
+        if (listExpenses!=null && listExpenses.size()>0) {
+            for (int a : listExpenses) {
+                expensesList.append("-").append(a).append(getString(R.string.rub) + "\n");
+            }
+            tvListExpenses.setText(expensesList.toString());
+        }
+
+            return view;
     }
 
 }

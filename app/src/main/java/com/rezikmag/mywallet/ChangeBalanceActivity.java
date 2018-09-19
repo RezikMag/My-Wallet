@@ -19,6 +19,8 @@ import java.util.GregorianCalendar;
 
 public class ChangeBalanceActivity extends AppCompatActivity {
 
+    public static final String TRANSACTION_TYPE = "transactionType";
+
     EditText mAddAmount;
     TextView mDateTextView;
     Button mOkButton;
@@ -31,8 +33,10 @@ public class ChangeBalanceActivity extends AppCompatActivity {
         mDateTextView = (TextView) findViewById(R.id.date_textview);
         mAddAmount = (EditText) findViewById(R.id.edit_change_balance);
         final Intent intent = getIntent();
-        String a = intent.getStringExtra("showDate");
-        mDateTextView.setText(a);
+        String date = intent.getStringExtra("showDate");
+        final String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
+
+        mDateTextView.setText(date);
 
         mOkButton = (Button) findViewById(R.id.ok_button);
 
@@ -55,10 +59,10 @@ public class ChangeBalanceActivity extends AppCompatActivity {
 
                 int amount = Integer.parseInt(mAddAmount.getText().toString());
 
-                Transaction transaction = new Transaction(amount,date);
+                Transaction transaction = new Transaction(amount,date,transactionType);
                 MainActivity.mDb.transactionDao().insert(transaction);
                 Log.d("DB_LOG", "amount: " + transaction.amount +
-                "date: "+ transaction.date);
+                "date: "+ transaction.date+ "type: " + transaction.transactionType);
 
                 adapter.notifyDataSetChanged();
 

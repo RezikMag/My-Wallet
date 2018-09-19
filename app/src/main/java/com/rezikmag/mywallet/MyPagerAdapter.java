@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
-    static final int PAGE_COUNT = 5;
+    static final int MIN_DAYS_NUMBER = 30;
     int range;
 
     @Override
@@ -48,9 +48,16 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         Bundle args = new Bundle();
         ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.mDb
                 .transactionDao().getAllDayIncome(date);
-        args.putIntegerArrayList(PageFragment.ARGUMENT_INCOME,dayIncome);
+        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.mDb
+                .transactionDao().getAllDayExpenses(date);
+        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_INCOME,dayIncome);
+        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES,dayExpenses);
+
         int income = MainActivity.mDb.transactionDao().getSumDayIncome(date);
+        int expenses = MainActivity.mDb.transactionDao().getSumDayExpenses(date);
+        args.putInt(PageFragment.ARGUMENT_TOTAL_EXPENSES,expenses);
         args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME,income);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,7 +77,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         long minTime = MainActivity.mDb.transactionDao().getMinDate();
         int dayRange = (int) TimeUnit.DAYS.convert(maxTime-minTime,TimeUnit.MILLISECONDS);
 
-        int range = (dayRange+1<PAGE_COUNT) ? PAGE_COUNT : dayRange+1;
+        int range = (dayRange+1< MIN_DAYS_NUMBER) ? MIN_DAYS_NUMBER : dayRange+1;
 //        Log.d("Tag",""+ range);
         return range;
     }

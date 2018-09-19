@@ -19,4 +19,19 @@
         android:gravity="center"
         android:textColor="@android:color/holo_green_dark"
         android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_total_expenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <TextView
+        android:id="@+id/tv_list_expenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="14sp"/>
 </LinearLayout>

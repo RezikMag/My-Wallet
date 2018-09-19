@@ -4,11 +4,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -16,16 +11,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,10 +24,11 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
 
     public static AppDataBase mDb;
-
-    Button mAddButon;
-
     static ViewPager pager;
+
+    Button mAddIncomeButon;
+    Button mAddExpensesButton;
+
     MyPagerAdapter pagerAdapter;
 
     @Override
@@ -47,7 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         pager = (ViewPager) findViewById(R.id.pager);
-        mAddButon = findViewById(R.id.add_balance);
+        mAddIncomeButon = findViewById(R.id.add_balance);
+        mAddExpensesButton = findViewById(R.id.minus_balance);
+
         mDb = AppDataBase.getInstanse(getApplicationContext());
 
         configureNavigationDrawer();
@@ -77,14 +70,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mAddButon.setOnClickListener(new View.OnClickListener() {
+        mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
                 intent.putExtra( "showDate",pagerAdapter.getPageTitle(pager.getCurrentItem()));
-                //                intent.putExtra("time", pagerAdapter.get(pager.getCurrentItem()) );
-//                 startActivityForResult(intent, 1234);
-           startActivity(intent);
+                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, getString(R.string.income));
+              startActivity(intent);
+            }
+        });
+
+        mAddExpensesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
+                intent.putExtra( "showDate",pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, getString(R.string.expenses));
+                startActivity(intent);
             }
         });
 

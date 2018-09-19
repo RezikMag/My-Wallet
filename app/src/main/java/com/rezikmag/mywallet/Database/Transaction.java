@@ -13,22 +13,24 @@ public class Transaction {
     @PrimaryKey(autoGenerate = true)
     public long id;
 
-//    public String transactionType;
+    public String transactionType;
 
     public int amount;
 
 //    @TypeConverters({TimeConverters.class})
     public long date;
 
-    public Transaction(long id, int amount, long date) {
+    public Transaction(long id, int amount, long date, String transactionType) {
         this.id = id;
         this.amount = amount;
         this.date = date;
+        this.transactionType=transactionType;
     }
 
     @Ignore
-    public Transaction(int amount, long date) {
+    public Transaction(int amount, long date, String transactionType) {
         this.amount = amount;
         this.date = date;
+        this.transactionType=transactionType;
     }
 }

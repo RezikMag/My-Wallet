@@ -47,29 +47,33 @@
                     android:id="@+id/pagerTitleStrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top">
-                </android.support.v4.view.PagerTitleStrip>
+                    android:layout_gravity="top"/>
             </android.support.v4.view.ViewPager>
 
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/add_balance"
-                    android:padding="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="add" />
+                    android:layout_gravity="center"
+                    android:padding="8dp"
+                    android:text="+"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:textSize="20sp" />
 
                 <Button
                     android:id="@+id/minus_balance"
-                    android:padding="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="remove" />
+                    android:padding="8dp"
+                    android:text="-"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="20sp" />
             </LinearLayout>
         </LinearLayout>
 
