@@ -14,29 +14,23 @@ import android.widget.TextView;
  */
 public class PageFragment extends Fragment {
 
-    static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
     static final String ARGUMENT_INCOME = "income";
-//    int pageNumber;
-
+    static final String ARGUMENT_DATE = "date";
 
     public PageFragment() {
         // Required empty public constructor
     }
 
 
-
-        @Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_page,container ,false);
-
-        TextView tvPage = (TextView) view.findViewById(R.id.tv_page);
-        tvPage.setText("Page"+ getArguments().getInt(ARGUMENT_PAGE_NUMBER));
+//        date = getArguments().getLong(ARGUMENT_DATE);
+        View view = inflater.inflate(R.layout.fragment_page, container, false);
 
         TextView tvIncome = (TextView) view.findViewById(R.id.tv_income);
         tvIncome.setText("Income: " + getArguments().getInt(ARGUMENT_INCOME));
-        // Inflate the layout for this fragment
         return view;
     }
 

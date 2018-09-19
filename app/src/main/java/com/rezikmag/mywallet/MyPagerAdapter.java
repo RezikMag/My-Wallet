@@ -4,35 +4,25 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
-
-    static final int PAGE_COUNT = 30;
-
-    ArrayList<Integer> incomeList = new ArrayList<>();
-
-    {
-        for (int i = 0; i <PAGE_COUNT; i++) {
-            incomeList.add(0);
-        }
-    }
+    static final int PAGE_COUNT = 5;
+    int range;
 
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.US);
         Calendar c = new GregorianCalendar();
-        c.add(Calendar.DAY_OF_YEAR , position - PAGE_COUNT+1);
+        c.add(Calendar.DAY_OF_YEAR , position - getDayRange()+1);
         Date date = c.getTime();
         String title =   sdf.format(date);
         return title;
@@ -47,10 +37,18 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = new PageFragment();
 
-        Bundle args = new Bundle();
 
-        args.putInt(PageFragment.ARGUMENT_PAGE_NUMBER,position+1);
-        args.putInt(PageFragment.ARGUMENT_INCOME,incomeList.get(position));
+        Calendar calendar = new GregorianCalendar();
+        calendar.add(Calendar.DAY_OF_YEAR , position - getDayRange()+1);
+        calendar.set(Calendar.HOUR,0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.set(Calendar.MILLISECOND,0);
+        long date = calendar.getTimeInMillis();
+
+        Bundle args = new Bundle();
+        int income = MainActivity.mDb.transactionDao().getDayIncome(date);
+        args.putInt(PageFragment.ARGUMENT_INCOME,income);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,7 +60,17 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return PAGE_COUNT;
+        return getDayRange();
+    }
+
+    public int getDayRange(){
+        long maxTime = MainActivity.mDb.transactionDao().getMaxDate();
+        long minTime = MainActivity.mDb.transactionDao().getMinDate();
+        int dayRange = (int) TimeUnit.DAYS.convert(maxTime-minTime,TimeUnit.MILLISECONDS);
+
+        int range = (dayRange+1<PAGE_COUNT) ? PAGE_COUNT : dayRange+1;
+//        Log.d("Tag",""+ range);
+        return range;
     }
 }
 

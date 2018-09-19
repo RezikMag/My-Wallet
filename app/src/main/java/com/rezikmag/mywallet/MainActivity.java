@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private static AppDataBase mDb;
+    public static AppDataBase mDb;
 
     Button mAddButon;
 
     static ViewPager pager;
-    PagerAdapter pagerAdapter;
+    MyPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-        pager.setCurrentItem(MyPagerAdapter.PAGE_COUNT);
+        pager.setCurrentItem(pagerAdapter.getDayRange());
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
-                intent.putExtra( "addIncome",pagerAdapter.getPageTitle(pager.getCurrentItem()));
-//                intent.putExtra("time", )
+                intent.putExtra( "showDate",pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                //                intent.putExtra("time", pagerAdapter.get(pager.getCurrentItem()) );
 //                 startActivityForResult(intent, 1234);
            startActivity(intent);
             }

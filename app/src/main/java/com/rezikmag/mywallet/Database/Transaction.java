@@ -17,17 +17,17 @@ public class Transaction {
 
     public int amount;
 
-    @TypeConverters({TimeConverters.class})
-    public Date date;
+//    @TypeConverters({TimeConverters.class})
+    public long date;
 
-    public Transaction(long id, int amount, Date date) {
+    public Transaction(long id, int amount, long date) {
         this.id = id;
         this.amount = amount;
         this.date = date;
     }
 
     @Ignore
-    public Transaction(int amount, Date date) {
+    public Transaction(int amount, long date) {
         this.amount = amount;
         this.date = date;
     }
