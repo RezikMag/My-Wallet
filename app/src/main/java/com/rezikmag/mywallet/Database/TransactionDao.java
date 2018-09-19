@@ -21,11 +21,14 @@ public interface TransactionDao {
     List<Transaction> getTransactions();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate")
-    int getDayIncome(long currentDate);
+    int getSumDayIncome(long currentDate);
 
     @Query("SELECT MAX(date) FROM transactions")
     long getMaxDate();
 
     @Query("SELECT MIN(date) FROM transactions")
     long getMinDate();
+
+    @Query("SELECT amount FROM transactions WHERE date=:currentDate")
+    List<Integer> getAllDayIncome(long currentDate);
 }

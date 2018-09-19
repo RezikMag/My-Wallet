@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,10 +45,12 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
         long date = calendar.getTimeInMillis();
-
         Bundle args = new Bundle();
-        int income = MainActivity.mDb.transactionDao().getDayIncome(date);
-        args.putInt(PageFragment.ARGUMENT_INCOME,income);
+        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.mDb
+                .transactionDao().getAllDayIncome(date);
+        args.putIntegerArrayList(PageFragment.ARGUMENT_INCOME,dayIncome);
+        int income = MainActivity.mDb.transactionDao().getSumDayIncome(date);
+        args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME,income);
         fragment.setArguments(args);
         return fragment;
     }
