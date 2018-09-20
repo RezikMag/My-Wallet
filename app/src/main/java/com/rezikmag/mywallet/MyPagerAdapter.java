@@ -21,10 +21,18 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.US);
-        Calendar c = new GregorianCalendar();
-        c.add(Calendar.DAY_OF_YEAR , position - getDayRange()+1);
-        Date date = c.getTime();
-        String title =   sdf.format(date);
+      /*  Calendar calendar = new GregorianCalendar();
+        calendar.add(Calendar.DAY_OF_YEAR, position - getDaysBeforeCurrent());
+
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+*/
+
+        long time =  getDayTime(position - getDaysBeforeCurrent());
+        Date date = new Date(time);
+        String title = sdf.format(date);
         return title;
     }
 
@@ -37,26 +45,23 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = new PageFragment();
 
+        long date = getDayTime(position - getDaysBeforeCurrent());
 
-        Calendar calendar = new GregorianCalendar();
-        calendar.add(Calendar.DAY_OF_YEAR , position - getDayRange()+1);
-        calendar.set(Calendar.HOUR,0);
-        calendar.set(Calendar.MINUTE,0);
-        calendar.set(Calendar.SECOND,0);
-        calendar.set(Calendar.MILLISECOND,0);
-        long date = calendar.getTimeInMillis();
         Bundle args = new Bundle();
-        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.mDb
-                .transactionDao().getAllDayIncome(date);
-        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.mDb
-                .transactionDao().getAllDayExpenses(date);
-        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_INCOME,dayIncome);
-        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES,dayExpenses);
 
-        int income = MainActivity.mDb.transactionDao().getSumDayIncome(date);
-        int expenses = MainActivity.mDb.transactionDao().getSumDayExpenses(date);
-        args.putInt(PageFragment.ARGUMENT_TOTAL_EXPENSES,expenses);
-        args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME,income);
+        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.getmDb()
+                .transactionDao().getAllDayIncome(date);
+        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getmDb()
+                .transactionDao().getAllDayExpenses(date);
+
+        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_INCOME, dayIncome);
+        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES, dayExpenses);
+
+        int income = MainActivity.getmDb().transactionDao().getSumDayIncome(date);
+        int expenses = MainActivity.getmDb().transactionDao().getSumDayExpenses(date);
+
+        args.putInt(PageFragment.ARGUMENT_TOTAL_EXPENSES, expenses);
+        args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME, income);
 
         fragment.setArguments(args);
         return fragment;
@@ -69,17 +74,41 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return getDayRange();
+        return getDaysBeforeCurrent() + getDAysAfterCurrent() + 1;
     }
 
-    public int getDayRange(){
-        long maxTime = MainActivity.mDb.transactionDao().getMaxDate();
-        long minTime = MainActivity.mDb.transactionDao().getMinDate();
-        int dayRange = (int) TimeUnit.DAYS.convert(maxTime-minTime,TimeUnit.MILLISECONDS);
+    public int getDaysBeforeCurrent() {
+        long minDbTime = MainActivity.getmDb().transactionDao().getMinDate();
+        long currentDayTime = getDayTime(0);
+        long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
+        if (minDbTime < minShowTime) {
+            minShowTime = minDbTime;
+        }
 
-        int range = (dayRange+1< MIN_DAYS_NUMBER) ? MIN_DAYS_NUMBER : dayRange+1;
-//        Log.d("Tag",""+ range);
-        return range;
+        int dayRange = (int) TimeUnit.DAYS.convert(currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
+        return dayRange;
+    }
+
+
+    public int getDAysAfterCurrent() {
+        long currentDayTime = getDayTime(0);
+        long maxDbTime = MainActivity.getmDb().transactionDao().getMaxDate();
+        if (maxDbTime < currentDayTime) {
+            return 0;
+        }
+        int dayRange = (int) TimeUnit.DAYS.convert(maxDbTime - currentDayTime, TimeUnit.MILLISECONDS);
+        return dayRange;
+    }
+
+    public long getDayTime(int dayBefore) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.add(Calendar.DAY_OF_YEAR, dayBefore);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
     }
 }
 

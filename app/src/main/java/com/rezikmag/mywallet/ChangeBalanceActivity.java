@@ -20,6 +20,8 @@ import java.util.GregorianCalendar;
 public class ChangeBalanceActivity extends AppCompatActivity {
 
     public static final String TRANSACTION_TYPE = "transactionType";
+    public static final int ADD_INCOME_BUTTON_CODE =1234;
+    public static final int ADD_EXPENSES_BUTTON_CODE =1334;
 
     EditText mAddAmount;
     TextView mDateTextView;
@@ -44,33 +46,9 @@ public class ChangeBalanceActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                MyPagerAdapter adapter = (MyPagerAdapter) MainActivity.pager.getAdapter();
-
-                Calendar calendar = new GregorianCalendar();
-
-                calendar.add(Calendar.DAY_OF_YEAR, MainActivity.pager.getCurrentItem()-
-                        adapter.getDayRange() +1);
-                calendar.set(Calendar.HOUR,0);
-                calendar.set(Calendar.MINUTE,0);
-                calendar.set(Calendar.SECOND,0);
-                calendar.set(Calendar.MILLISECOND,0);
-                long date = calendar.getTimeInMillis();
-
-
-                int amount = Integer.parseInt(mAddAmount.getText().toString());
-
-                Transaction transaction = new Transaction(amount,date,transactionType);
-                MainActivity.mDb.transactionDao().insert(transaction);
-                Log.d("DB_LOG", "amount: " + transaction.amount +
-                "date: "+ transaction.date+ "type: " + transaction.transactionType);
-
-                adapter.notifyDataSetChanged();
-
-                /*
-                Intent intent1 = new Intent();
-                intent1.putExtra("income", Integer.parseInt(mAddAmount.getText().toString()));
-                setResult(RESULT_OK, intent1);
-                 */
+                Intent backIntent = new Intent();
+                backIntent.putExtra("amount", Integer.parseInt(mAddAmount.getText().toString()));
+                setResult(RESULT_OK, backIntent);
                 finish();
             }
         });

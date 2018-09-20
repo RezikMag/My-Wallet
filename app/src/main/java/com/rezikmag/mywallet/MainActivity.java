@@ -11,20 +11,26 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
+import com.rezikmag.mywallet.Database.Transaction;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+public class MainActivity
+        extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
     private Toolbar toolbar;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    public static AppDataBase mDb;
-    static ViewPager pager;
+    private static AppDataBase mDb;
+    ViewPager pager;
 
     Button mAddIncomeButon;
     Button mAddExpensesButton;
@@ -46,12 +52,10 @@ public class MainActivity extends AppCompatActivity {
         configureNavigationDrawer();
         configureToolbar();
 
-
-
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-        pager.setCurrentItem(pagerAdapter.getDayRange());
+        pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent()+1);
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -73,23 +77,25 @@ public class MainActivity extends AppCompatActivity {
         mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
-                intent.putExtra( "showDate",pagerAdapter.getPageTitle(pager.getCurrentItem()));
-                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, getString(R.string.income));
-              startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
+                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
 
         mAddExpensesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ChangeBalanceActivity.class);
-                intent.putExtra( "showDate",pagerAdapter.getPageTitle(pager.getCurrentItem()));
-                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, getString(R.string.expenses));
-                startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
+                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
 
+    }
+
+    public static AppDataBase getmDb() {
+        return mDb;
     }
 
     @Override
@@ -102,10 +108,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
 
-        if (mDrawerToggle.onOptionsItemSelected(item)){
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        switch(itemId) {
+        switch (itemId) {
         }
         return super.onOptionsItemSelected(item);
     }
@@ -116,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
 // Синхронизировать состояние выключателя после onRestoreInstanceState.
         mDrawerToggle.syncState();
     }
-
-
 
 
     private void configureNavigationDrawer() {
@@ -134,14 +138,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     private void configureToolbar() {
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeButtonEnabled(true);
-
-//        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 toolbar, R.string.open_drawer, R.string.close_drawer) {
@@ -163,16 +166,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-/*
-   @Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) return;
-        int amount = data.getIntExtra("income",0);
-        Log.d("Tag",""+ amount);
+        if (data == null) {
+            return;
+        }
+        String transactionType = "";
+        switch (requestCode) {
+            case ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE:
+                transactionType = getString(R.string.expenses);
+                break;
+            case ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE:
+                transactionType = getString(R.string.income);
+                break;
+        }
 
-        pagerAdapter.incomeList.set(pager.getCurrentItem(),amount);
-        pagerAdapter.getItem(pager.getCurrentItem());
+        long date = pagerAdapter.getDayTime(pager.getCurrentItem() -
+                pagerAdapter.getDaysBeforeCurrent());
+
+        int amount = data.getIntExtra("amount", 0);
+
+        Transaction transaction = new Transaction(amount, date, transactionType);
+        mDb.transactionDao().insert(transaction);
+        Log.d("DB_LOG", "amount: " + transaction.amount +
+                "date: " + transaction.date + "type: " + transaction.transactionType);
+
         pagerAdapter.notifyDataSetChanged();
     }
-    */
 }
