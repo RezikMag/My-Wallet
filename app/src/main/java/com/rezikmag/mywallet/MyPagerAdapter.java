@@ -21,15 +21,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.US);
-      /*  Calendar calendar = new GregorianCalendar();
-        calendar.add(Calendar.DAY_OF_YEAR, position - getDaysBeforeCurrent());
-
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-*/
-
         long time =  getDayTime(position - getDaysBeforeCurrent());
         Date date = new Date(time);
         String title = sdf.format(date);
@@ -51,6 +42,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.getmDb()
                 .transactionDao().getAllDayIncome(date);
+
         ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getmDb()
                 .transactionDao().getAllDayExpenses(date);
 
@@ -88,7 +80,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         int dayRange = (int) TimeUnit.DAYS.convert(currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
         return dayRange;
     }
-
 
     public int getDAysAfterCurrent() {
         long currentDayTime = getDayTime(0);

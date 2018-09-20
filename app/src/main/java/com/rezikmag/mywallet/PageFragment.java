@@ -29,7 +29,6 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        date = getArguments().getLong(ARGUMENT_DATE);
         View view = inflater.inflate(R.layout.fragment_page, container, false);
 
         TextView tvTotalIncome = (TextView) view.findViewById(R.id.tv_total_income);
@@ -60,7 +59,6 @@ public class PageFragment extends Fragment {
             }
             tvListExpenses.setText(expensesList.toString());
         }
-
             return view;
     }
 

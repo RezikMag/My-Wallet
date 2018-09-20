@@ -55,7 +55,7 @@ public class MainActivity
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-        pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent()+1);
+        pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent());
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
@@ -78,7 +78,8 @@ public class MainActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
+                        -pagerAdapter.getDaysBeforeCurrent()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
@@ -87,7 +88,8 @@ public class MainActivity
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
+                        -pagerAdapter.getDaysBeforeCurrent()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
@@ -181,8 +183,7 @@ public class MainActivity
                 break;
         }
 
-        long date = pagerAdapter.getDayTime(pager.getCurrentItem() -
-                pagerAdapter.getDaysBeforeCurrent());
+        long date = data.getLongExtra("time",0);
 
         int amount = data.getIntExtra("amount", 0);
 

@@ -1,7 +1,9 @@
 package com.rezikmag.mywallet;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,37 +12,43 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.rezikmag.mywallet.Database.Transaction;
-
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
-public class ChangeBalanceActivity extends AppCompatActivity {
+import java.util.Date;
+
+public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
 
     public static final String TRANSACTION_TYPE = "transactionType";
-    public static final int ADD_INCOME_BUTTON_CODE =1234;
-    public static final int ADD_EXPENSES_BUTTON_CODE =1334;
+    public static final int ADD_INCOME_BUTTON_CODE = 1234;
+    public static final int ADD_EXPENSES_BUTTON_CODE = 1334;
 
     EditText mAddAmount;
-    TextView mDateTextView;
+    TextView mDateButton;
     Button mOkButton;
+
+    long time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_balance);
 
-        mDateTextView = (TextView) findViewById(R.id.date_textview);
+        mDateButton = findViewById(R.id.date_button);
         mAddAmount = (EditText) findViewById(R.id.edit_change_balance);
-        final Intent intent = getIntent();
-        String date = intent.getStringExtra("showDate");
-        final String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
 
-        mDateTextView.setText(date);
+        Intent intent = getIntent();
+        time = intent.getLongExtra("showDate", 0);
+        setDate(time);
 
+//        String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
         mOkButton = (Button) findViewById(R.id.ok_button);
+
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(time);
+            }
+        });
 
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,9 +56,42 @@ public class ChangeBalanceActivity extends AppCompatActivity {
 
                 Intent backIntent = new Intent();
                 backIntent.putExtra("amount", Integer.parseInt(mAddAmount.getText().toString()));
+                backIntent.putExtra("time", time);
                 setResult(RESULT_OK, backIntent);
                 finish();
             }
         });
+    }
+
+    void showDialog(long time) {
+        // Create the fragment and show it as a dialog.
+/*
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+*/
+
+        // Create and show the dialog.
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment newFragment = ChooseDateDialogFragment.newInstance(time);
+        newFragment.show(fm, "dialog");
+    }
+
+
+    @Override
+    public void OnFinishDialogSetDate(long time) {
+        setDate(time);
+        Log.d("Tag_frag","Time: " + time);
+        this.time = time;
+    }
+
+    void setDate(long time) {
+        Date date = new Date(time);
+        SimpleDateFormat format = new SimpleDateFormat("dd MMMM");
+        String stringDate = format.format(date);
+        mDateButton.setText(stringDate);
     }
 }
