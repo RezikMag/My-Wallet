@@ -8,13 +8,14 @@
     tools:context=".ChangeBalanceActivity">
 
     <Button
-        android:id="@+id/date_button"
+        android:id="@+id/btn_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/ic_calendar_black_24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -26,9 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:inputType="number"
-        app:layout_constraintEnd_toEndOf="@+id/date_button"
-        app:layout_constraintStart_toStartOf="@+id/date_button"
-        app:layout_constraintTop_toBottomOf="@+id/date_button" />
+        app:layout_constraintEnd_toEndOf="@+id/btn_date"
+        app:layout_constraintStart_toStartOf="@+id/btn_date"
+        app:layout_constraintTop_toBottomOf="@+id/btn_date" />
 
     <Button
         android:id="@+id/ok_button"

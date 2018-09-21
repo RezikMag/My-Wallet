@@ -1,6 +1,5 @@
 package com.rezikmag.mywallet;
 
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -33,7 +32,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_balance);
 
-        mDateButton = findViewById(R.id.date_button);
+        mDateButton = findViewById(R.id.btn_date);
         mAddAmount = (EditText) findViewById(R.id.edit_change_balance);
 
         Intent intent = getIntent();
@@ -55,7 +54,8 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
             public void onClick(View v) {
 
                 Intent backIntent = new Intent();
-                backIntent.putExtra("amount", Integer.parseInt(mAddAmount.getText().toString()));
+                backIntent.putExtra("amount",
+                        Integer.parseInt(mAddAmount.getText().toString()));
                 backIntent.putExtra("time", time);
                 setResult(RESULT_OK, backIntent);
                 finish();
@@ -64,16 +64,6 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
     }
 
     void showDialog(long time) {
-        // Create the fragment and show it as a dialog.
-/*
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
-        if (prev != null) {
-            ft.remove(prev);
-        }
-        ft.addToBackStack(null);
-*/
-
         // Create and show the dialog.
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment newFragment = ChooseDateDialogFragment.newInstance(time);
@@ -94,4 +84,5 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         String stringDate = format.format(date);
         mDateButton.setText(stringDate);
     }
+
 }

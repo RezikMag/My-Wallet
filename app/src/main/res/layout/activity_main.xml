@@ -38,13 +38,13 @@
             android:orientation="vertical">
 
             <android.support.v4.view.ViewPager
-                android:id="@+id/pager"
+                android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
                 <android.support.v4.view.PagerTitleStrip
-                    android:id="@+id/pagerTitleStrip"
+                    android:id="@+id/pager_title_strip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"/>
@@ -57,7 +57,7 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/add_balance"
+                    android:id="@+id/btn_add_income"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -67,7 +67,7 @@
                     android:textSize="20sp" />
 
                 <Button
-                    android:id="@+id/minus_balance"
+                    android:id="@+id/btn_add_expenses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="8dp"
@@ -82,7 +82,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            app:menu="@menu/navigation_menu" />
+            app:menu="@menu/navigation_menu">
+        <!--<CalendarView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"/>-->
+        </android.support.design.widget.NavigationView>
 
 
     </android.support.v4.widget.DrawerLayout>

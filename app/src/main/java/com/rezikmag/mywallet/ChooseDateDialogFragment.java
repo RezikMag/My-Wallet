@@ -2,7 +2,6 @@ package com.rezikmag.mywallet;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,10 +29,10 @@ public class ChooseDateDialogFragment extends DialogFragment  {
 
     public View onCreateView( LayoutInflater inflater,  ViewGroup container,
                               Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.calendar_dialog, container, false);
+        View v = inflater.inflate(R.layout.dialog_calendar, container, false);
 
-        final CalendarView calendarView = v.findViewById(R.id.calendarView);
-        Button chooseDateButton = v.findViewById(R.id.button);
+        final CalendarView calendarView = v.findViewById(R.id.calendar_view);
+        Button chooseDateButton = v.findViewById(R.id.btn_ok);
         long time = getArguments().getLong("time");
         calendarView.setDate(time);
 

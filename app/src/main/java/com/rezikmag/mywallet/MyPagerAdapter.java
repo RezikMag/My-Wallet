@@ -15,19 +15,17 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
-    static final int MIN_DAYS_NUMBER = 30;
-    int range;
+     static final int MIN_DAYS_NUMBER = 30;
 
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.US);
         long time =  getDayTime(position - getDaysBeforeCurrent());
         Date date = new Date(time);
-        String title = sdf.format(date);
-        return title;
+        return sdf.format(date);
     }
 
-    public MyPagerAdapter(FragmentManager fm) {
+    MyPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -40,17 +38,17 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         Bundle args = new Bundle();
 
-        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.getmDb()
+        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.getDb()
                 .transactionDao().getAllDayIncome(date);
 
-        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getmDb()
+        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getDb()
                 .transactionDao().getAllDayExpenses(date);
 
         args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_INCOME, dayIncome);
         args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES, dayExpenses);
 
-        int income = MainActivity.getmDb().transactionDao().getSumDayIncome(date);
-        int expenses = MainActivity.getmDb().transactionDao().getSumDayExpenses(date);
+        int income = MainActivity.getDb().transactionDao().getSumDayIncome(date);
+        int expenses = MainActivity.getDb().transactionDao().getSumDayExpenses(date);
 
         args.putInt(PageFragment.ARGUMENT_TOTAL_EXPENSES, expenses);
         args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME, income);
@@ -70,20 +68,21 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public int getDaysBeforeCurrent() {
-        long minDbTime = MainActivity.getmDb().transactionDao().getMinDate();
+        long minDbTime = MainActivity.getDb().transactionDao().getMinDate();
         long currentDayTime = getDayTime(0);
         long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
         if (minDbTime < minShowTime) {
             minShowTime = minDbTime;
         }
 
-        int dayRange = (int) TimeUnit.DAYS.convert(currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
+        int dayRange = (int) TimeUnit.DAYS.convert(
+                currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
         return dayRange;
     }
 
     public int getDAysAfterCurrent() {
         long currentDayTime = getDayTime(0);
-        long maxDbTime = MainActivity.getmDb().transactionDao().getMaxDate();
+        long maxDbTime = MainActivity.getDb().transactionDao().getMaxDate();
         if (maxDbTime < currentDayTime) {
             return 0;
         }

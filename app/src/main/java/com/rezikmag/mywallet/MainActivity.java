@@ -22,20 +22,17 @@ import com.rezikmag.mywallet.Database.Transaction;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class MainActivity
-        extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private Toolbar toolbar;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private static AppDataBase mDb;
     ViewPager pager;
 
-    Button mAddIncomeButon;
-    Button mAddExpensesButton;
-
     MyPagerAdapter pagerAdapter;
+
+    long date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +40,9 @@ public class MainActivity
         setContentView(R.layout.activity_main);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        pager = (ViewPager) findViewById(R.id.pager);
-        mAddIncomeButon = findViewById(R.id.add_balance);
-        mAddExpensesButton = findViewById(R.id.minus_balance);
+        pager = (ViewPager) findViewById(R.id.view_pager);
+        Button mAddIncomeButon = findViewById(R.id.btn_add_income);
+        Button mAddExpensesButton = findViewById(R.id.btn_add_expenses);
 
         mDb = AppDataBase.getInstanse(getApplicationContext());
 
@@ -58,7 +55,6 @@ public class MainActivity
         pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent());
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
             @Override
             public void onPageSelected(int position) {
 //                Log.d(TAG, "onPageSelected, position = " + position);
@@ -74,12 +70,13 @@ public class MainActivity
             }
         });
 
+        // нужно рефакторить? вынести в отдельный метод?
         mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
                 intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
-                        -pagerAdapter.getDaysBeforeCurrent()));
+                        - pagerAdapter.getDaysBeforeCurrent()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
@@ -89,15 +86,36 @@ public class MainActivity
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
                 intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
-                        -pagerAdapter.getDaysBeforeCurrent()));
+                        - pagerAdapter.getDaysBeforeCurrent()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
 
     }
 
-    public static AppDataBase getmDb() {
+    public static AppDataBase getDb() {
         return mDb;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (date != 0) {
+            long difference;
+            int position;
+            long minDbDate = mDb.transactionDao().getMinDate();
+            long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+            if (minDbDate<minDefaultDate &&minDbDate!=0) {
+                difference = date - minDbDate;
+               }else {
+                difference = date - minDefaultDate;
+            }
+            position = (int) (difference/(24 * 60 * 60 * 1000));
+            Log.d("Tag", "date" + date + " mindate:" + minDbDate);
+            Log.d("Tag", "diff: " + difference + ",pos: " + position);
+
+            pager.setCurrentItem(position);
+        }
     }
 
     @Override
@@ -142,12 +160,13 @@ public class MainActivity
     }
 
     private void configureToolbar() {
-        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeButtonEnabled(true);
-
+        if (actionbar != null) {
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeButtonEnabled(true);
+        }
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 toolbar, R.string.open_drawer, R.string.close_drawer) {
 
@@ -183,8 +202,7 @@ public class MainActivity
                 break;
         }
 
-        long date = data.getLongExtra("time",0);
-
+        date = data.getLongExtra("time", 0);
         int amount = data.getIntExtra("amount", 0);
 
         Transaction transaction = new Transaction(amount, date, transactionType);
