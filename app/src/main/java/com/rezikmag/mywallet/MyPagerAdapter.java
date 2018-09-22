@@ -64,23 +64,24 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return getDaysBeforeCurrent() + getDAysAfterCurrent() + 1;
+        return getDaysBeforeCurrent() + getDaysAfterCurrent() + 1;
     }
 
     public int getDaysBeforeCurrent() {
-        long minDbTime = MainActivity.getDb().transactionDao().getMinDate();
         long currentDayTime = getDayTime(0);
         long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
-        if (minDbTime < minShowTime && minDbTime!=0) {
-            minShowTime = minDbTime;
+        if (MainActivity.getDb().transactionDao().getTransactionsCount()>0) {
+            long minDbTime = MainActivity.getDb().transactionDao().getMinDate();
+            if (minDbTime < minShowTime && minDbTime != 0) {
+                minShowTime = minDbTime;
+            }
         }
-
         int dayRange = (int) TimeUnit.DAYS.convert(
                 currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
         return dayRange;
     }
 
-    public int getDAysAfterCurrent() {
+    public int getDaysAfterCurrent() {
         long currentDayTime = getDayTime(0);
         long maxDbTime = MainActivity.getDb().transactionDao().getMaxDate();
         if (maxDbTime < currentDayTime) {

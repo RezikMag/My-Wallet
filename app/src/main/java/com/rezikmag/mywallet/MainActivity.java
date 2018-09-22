@@ -218,26 +218,42 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
-        long difference;
-        int position;
-        long minDbDate = mDb.transactionDao().getMinDate();
-        long maxDbDate = mDb.transactionDao().getMaxDate();
+
         long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-        if (minDbDate < minDefaultDate && minDbDate != 0) {
-            difference = date - minDbDate;
-        } else {
-            difference = date - minDefaultDate;
+
+        long minDate;
+        long maxDate;
+        if (mDb.transactionDao().getTransactionsCount() == 0) {
+            minDate = minDefaultDate;
+            maxDate= new Date().getTime();
+        }else {
+            long minDbDate = mDb.transactionDao().getMinDate();
+            long maxDbDate = mDb.transactionDao().getMaxDate();
+            if (maxDbDate>new Date().getTime()){
+                maxDate = maxDbDate;
+            }else {
+             maxDate = new Date().getTime();
+            }
+            if (minDbDate < minDefaultDate) {
+                minDate = minDbDate;
+            } else {
+                minDate = minDefaultDate;
+            }
         }
-        position = (int) (difference / (24 * 60 * 60 * 1000));
-        Log.d("Tag", "date" + date + " mindate:" + minDbDate);
-        Log.d("Tag", "diff: " + difference + ",pos: " + position);
-        if ((date < minDbDate && date < minDefaultDate) ||
-                (date > maxDbDate && date > new Date().getTime())) {
-            Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
-                    " записей не существует", Toast.LENGTH_LONG).show();
+        Log.d("Tag", "date" + date + " mindate:" + minDate);
+        long difference = date - minDate;
+        if ((date < minDate) || (date > maxDate)) {
+            showErrorToast();
             return;
         }
+        int position = (int) (difference / (24 * 60 * 60 * 1000));
+        Log.d("Tag", "diff: " + difference + ",pos: " + position);
         pager.setCurrentItem(position);
+    }
+
+    void showErrorToast() {
+        Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
+                " записей не существует", Toast.LENGTH_LONG).show();
 
     }
 }

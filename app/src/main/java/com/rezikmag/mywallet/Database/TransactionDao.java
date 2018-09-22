@@ -35,6 +35,8 @@ public interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
     int getSumDayExpenses(long currentDate);
 
+    @Query("SELECT COUNT(*) FROM transactions")
+    int getTransactionsCount();
 
     @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
     List<Integer> getAllDayExpenses(long currentDate);
