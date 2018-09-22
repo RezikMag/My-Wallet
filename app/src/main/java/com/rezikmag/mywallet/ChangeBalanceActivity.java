@@ -63,7 +63,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         });
     }
 
-    void showDialog(long time) {
+     void showDialog(long time) {
         // Create and show the dialog.
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment newFragment = ChooseDateDialogFragment.newInstance(time);
@@ -72,7 +72,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
 
 
     @Override
-    public void OnFinishDialogSetDate(long time) {
+    public void onFinishDialogSetDate(long time) {
         setDate(time);
         Log.d("Tag_frag","Time: " + time);
         this.time = time;

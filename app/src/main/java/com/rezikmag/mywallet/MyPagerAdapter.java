@@ -71,7 +71,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         long minDbTime = MainActivity.getDb().transactionDao().getMinDate();
         long currentDayTime = getDayTime(0);
         long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
-        if (minDbTime < minShowTime) {
+        if (minDbTime < minShowTime && minDbTime!=0) {
             minShowTime = minDbTime;
         }
 

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -12,17 +14,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
 import com.rezikmag.mywallet.Database.Transaction;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -32,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     MyPagerAdapter pagerAdapter;
 
-    long date;
+    long date = new Date().getTime();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         pager = (ViewPager) findViewById(R.id.view_pager);
         Button mAddIncomeButon = findViewById(R.id.btn_add_income);
         Button mAddExpensesButton = findViewById(R.id.btn_add_expenses);
+        Button mDateChooseButton = findViewById(R.id.btn_nav_date_chose);
 
         mDb = AppDataBase.getInstanse(getApplicationContext());
 
@@ -91,31 +97,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mDateChooseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(date);
+            }
+        });
+
+    }
+
+    void showDialog(long time) {
+        // Create and show the dialog.
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment newFragment = ChooseDateDialogFragment.newInstance(time);
+        newFragment.show(fm, "dialog from nav");
     }
 
     public static AppDataBase getDb() {
         return mDb;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (date != 0) {
-            long difference;
-            int position;
-            long minDbDate = mDb.transactionDao().getMinDate();
-            long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-            if (minDbDate<minDefaultDate &&minDbDate!=0) {
-                difference = date - minDbDate;
-               }else {
-                difference = date - minDefaultDate;
-            }
-            position = (int) (difference/(24 * 60 * 60 * 1000));
-            Log.d("Tag", "date" + date + " mindate:" + minDbDate);
-            Log.d("Tag", "diff: " + difference + ",pos: " + position);
-
-            pager.setCurrentItem(position);
-        }
     }
 
     @Override
@@ -211,5 +210,34 @@ public class MainActivity extends AppCompatActivity {
                 "date: " + transaction.date + "type: " + transaction.transactionType);
 
         pagerAdapter.notifyDataSetChanged();
+        onFinishDialogSetDate(date);
+    }
+
+    @Override
+    public void onFinishDialogSetDate(long date) {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawers();
+        }
+        long difference;
+        int position;
+        long minDbDate = mDb.transactionDao().getMinDate();
+        long maxDbDate = mDb.transactionDao().getMaxDate();
+        long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+        if (minDbDate < minDefaultDate && minDbDate != 0) {
+            difference = date - minDbDate;
+        } else {
+            difference = date - minDefaultDate;
+        }
+        position = (int) (difference / (24 * 60 * 60 * 1000));
+        Log.d("Tag", "date" + date + " mindate:" + minDbDate);
+        Log.d("Tag", "diff: " + difference + ",pos: " + position);
+        if ((date < minDbDate && date < minDefaultDate) ||
+                (date > maxDbDate && date > new Date().getTime())) {
+            Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
+                    " записей не существует", Toast.LENGTH_LONG).show();
+            return;
+        }
+        pager.setCurrentItem(position);
+
     }
 }

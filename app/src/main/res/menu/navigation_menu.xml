@@ -2,17 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/show_day"
-            android:title="@string/day"/>
+        <item
+            android:id="@+id/show_day"
+            android:title="@string/day" />
 
-        <item android:id="@+id/show_week"
-            android:title="@string/week"/>
+        <item
+            android:id="@+id/show_week"
+            android:title="@string/week" />
 
-        <item android:id="@+id/show_mounth"
-            android:title="@string/mounth"/>
+        <item
+            android:id="@+id/show_mounth"
+            android:title="@string/mounth" />
 
-        <item android:id="@+id/show_year"
-            android:title="@string/year"/>
+        <item
+            android:id="@+id/show_year"
+            android:title="@string/year" />
     </group>
 
 </menu>

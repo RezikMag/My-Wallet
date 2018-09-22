@@ -16,7 +16,7 @@ import java.util.GregorianCalendar;
 public class ChooseDateDialogFragment extends DialogFragment  {
 
     public interface EditDateListener {
-        public void OnFinishDialogSetDate(long time);
+        public void onFinishDialogSetDate(long time);
     }
 
     static ChooseDateDialogFragment newInstance(long time) {
@@ -59,7 +59,7 @@ public class ChooseDateDialogFragment extends DialogFragment  {
                 calendar.set(Calendar.MINUTE,0);
                 calendar.set(Calendar.HOUR,0);
                 Log.d("Tag_frag", "Date:" + date[0]);
-                listener.OnFinishDialogSetDate(calendar.getTimeInMillis());
+                listener.onFinishDialogSetDate(calendar.getTimeInMillis());
                 dismiss();
             }
         });
