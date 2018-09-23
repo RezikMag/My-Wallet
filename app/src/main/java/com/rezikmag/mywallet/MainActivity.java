@@ -23,21 +23,28 @@ import android.widget.Toast;
 import com.rezikmag.mywallet.Database.AppDataBase;
 import com.rezikmag.mywallet.Database.Transaction;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+
+import io.reactivex.Completable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-
     private static AppDataBase mDb;
-    ViewPager pager;
 
-    MyPagerAdapter pagerAdapter;
+    private ViewPager pager;
+    private MyPagerAdapter pagerAdapter;
 
     long date = new Date().getTime();
+
+    private CompositeDisposable mDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +57,17 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         Button mAddExpensesButton = findViewById(R.id.btn_add_expenses);
         Button mDateChooseButton = findViewById(R.id.btn_nav_date_chose);
 
-        mDb = AppDataBase.getInstanse(getApplicationContext());
+        mDb = AppDataBase.getInstance(getApplicationContext());
 
         configureNavigationDrawer();
         configureToolbar();
 
+        mDisposable = new CompositeDisposable();
+
         pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-
         pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent());
-
+/*
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -74,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
             @Override
             public void onPageScrollStateChanged(int state) {
             }
-        });
+        });*/
 
         // нужно рефакторить? вынести в отдельный метод?
         mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
@@ -202,12 +210,29 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         }
 
         date = data.getLongExtra("time", 0);
-        int amount = data.getIntExtra("amount", 0);
+        final int amount = data.getIntExtra("amount", 0);
 
-        Transaction transaction = new Transaction(amount, date, transactionType);
-        mDb.transactionDao().insert(transaction);
-        Log.d("DB_LOG", "amount: " + transaction.amount +
-                "date: " + transaction.date + "type: " + transaction.transactionType);
+        final String finalTransactionType = transactionType;
+
+
+        Completable completable = Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                Transaction transaction = new Transaction(amount, date, finalTransactionType);
+                mDb.transactionDao().insert(transaction);
+                Log.d("DB_LOG", "amount: " + transaction.getAmount() +
+                        "date: " + transaction.date + "type: " + transaction.getTransactionType());
+            }
+        });
+
+       mDisposable.add(completable.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action() {
+            @Override
+            public void run() throws Exception {
+
+            }
+        }));
 
         pagerAdapter.notifyDataSetChanged();
         onFinishDialogSetDate(date);
@@ -225,14 +250,14 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         long maxDate;
         if (mDb.transactionDao().getTransactionsCount() == 0) {
             minDate = minDefaultDate;
-            maxDate= new Date().getTime();
-        }else {
+            maxDate = new Date().getTime();
+        } else {
             long minDbDate = mDb.transactionDao().getMinDate();
             long maxDbDate = mDb.transactionDao().getMaxDate();
-            if (maxDbDate>new Date().getTime()){
+            if (maxDbDate > new Date().getTime()) {
                 maxDate = maxDbDate;
-            }else {
-             maxDate = new Date().getTime();
+            } else {
+                maxDate = new Date().getTime();
             }
             if (minDbDate < minDefaultDate) {
                 minDate = minDbDate;
@@ -256,4 +281,5 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 " записей не существует", Toast.LENGTH_LONG).show();
 
     }
+
 }

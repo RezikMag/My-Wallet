@@ -52,10 +52,9 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String amount = mAddAmount.getText().toString();
                 Intent backIntent = new Intent();
-                backIntent.putExtra("amount",
-                        Integer.parseInt(mAddAmount.getText().toString()));
+                backIntent.putExtra("amount", Integer.parseInt(amount));
                 backIntent.putExtra("time", time);
                 setResult(RESULT_OK, backIntent);
                 finish();
@@ -84,5 +83,6 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         String stringDate = format.format(date);
         mDateButton.setText(stringDate);
     }
+
 
 }

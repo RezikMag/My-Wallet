@@ -5,22 +5,33 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
-     static final int MIN_DAYS_NUMBER = 30;
+    static final int MIN_DAYS_NUMBER = 30;
+
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     @Override
     public CharSequence getPageTitle(int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM", Locale.US);
-        long time =  getDayTime(position - getDaysBeforeCurrent());
+        long time = getDayTime(position - getDaysBeforeCurrent());
         Date date = new Date(time);
         return sdf.format(date);
     }
@@ -32,19 +43,38 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = new PageFragment();
+        final PageFragment fragment = new PageFragment();
 
         long date = getDayTime(position - getDaysBeforeCurrent());
 
-        Bundle args = new Bundle();
+        final Bundle args = new Bundle();
 
-        ArrayList<Integer> dayIncome = (ArrayList<Integer>) MainActivity.getDb()
-                .transactionDao().getAllDayIncome(date);
+
+        Disposable getDayIncome =
+                MainActivity.getDb().transactionDao().getAllDayIncome(date)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<List<Integer>>() {
+                            @Override
+                            public void accept(List<Integer> integers) throws Exception {
+                               StringBuffer sb = new StringBuffer();
+                                if (integers != null && integers.size() > 0) {
+                                    for (int a : integers) {
+                                        sb.append("+").append(a).append("Rub" +"\n");
+                                    }
+                                    Log.d("DB_LOG", "size" + integers.size());
+                                    fragment.tvListIncome.setText(sb.toString());
+                                }
+                            }
+                        });
+
+        disposable.add(getDayIncome);
 
         ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getDb()
                 .transactionDao().getAllDayExpenses(date);
 
-        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_INCOME, dayIncome);
+
+//        PageFragment.ARGUMENT_TRANSACTION_INCOME, (ArrayList<Integer>) integers);
         args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES, dayExpenses);
 
         int income = MainActivity.getDb().transactionDao().getSumDayIncome(date);
@@ -70,7 +100,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public int getDaysBeforeCurrent() {
         long currentDayTime = getDayTime(0);
         long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
-        if (MainActivity.getDb().transactionDao().getTransactionsCount()>0) {
+        if (MainActivity.getDb().transactionDao().getTransactionsCount() > 0) {
             long minDbTime = MainActivity.getDb().transactionDao().getMinDate();
             if (minDbTime < minShowTime && minDbTime != 0) {
                 minShowTime = minDbTime;

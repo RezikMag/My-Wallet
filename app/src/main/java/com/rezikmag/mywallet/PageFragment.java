@@ -25,6 +25,8 @@ public class PageFragment extends Fragment {
         // Required empty public constructor
     }
 
+    TextView tvListIncome;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -38,20 +40,20 @@ public class PageFragment extends Fragment {
         tvTotalExpenses.setText("Expenses: "+ getArguments().getInt(ARGUMENT_TOTAL_EXPENSES) + " Rub.");
 
 
-        TextView tvListIncome = (TextView) view.findViewById(R.id.tv_list_income);
+         tvListIncome = (TextView) view.findViewById(R.id.tv_list_income);
         TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
-        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
+//        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
         ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
 
         StringBuffer incomeList = new StringBuffer();
-        if (listIncome!=null && listIncome.size()>0) {
+  /*      if (listIncome!=null && listIncome.size()>0) {
             for (int a : listIncome) {
     incomeList.append("+").append(a).append(getString(R.string.rub) +"\n");
             }
             tvListIncome.setText(incomeList.toString());
         }
-
+*/
         StringBuffer expensesList = new StringBuffer();
         if (listExpenses!=null && listExpenses.size()>0) {
             for (int a : listExpenses) {
