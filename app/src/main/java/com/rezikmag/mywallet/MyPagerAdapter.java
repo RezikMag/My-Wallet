@@ -1,4 +1,4 @@
- package com.rezikmag.mywallet;
+package com.rezikmag.mywallet;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,10 +14,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -54,22 +56,22 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         Fragment fragment = PageFragment.newInstance(MainActivity.getDb().transactionDao().getSumDayIncome(date),
                 MainActivity.getDb().transactionDao().getSumDayExpenses(date),
-                (ArrayList<Integer>)   MainActivity.getDb().transactionDao().getAllDayIncome(date),
-                (ArrayList<Integer>)      MainActivity.getDb().transactionDao().getAllDayExpenses(date));
-        Log.d("RX_Test","getItem: " + position);
+                (ArrayList<Integer>) MainActivity.getDb().transactionDao().getAllDayIncome(date),
+                (ArrayList<Integer>) MainActivity.getDb().transactionDao().getAllDayExpenses(date));
+        Log.d("RX_Test", "getItem: " + position);
 
         return fragment;
     }
 
     @Override
     public int getItemPosition(@NonNull Object object) {
-        Log.d("RX_Test","ItemPosition");
+        Log.d("RX_Test", "ItemPosition");
         return POSITION_NONE;
     }
 
     @Override
     public int getCount() {
-        Log.d("RX_Test", "ItemCount: "+ (getDaysBeforeCurrent()+ getDaysAfterCurrent()+1));
+        Log.d("RX_Test", "ItemCount: " + (getDaysBeforeCurrent() + getDaysAfterCurrent() + 1));
         return getDaysBeforeCurrent() + getDaysAfterCurrent() + 1;
     }
 
@@ -84,19 +86,20 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         }
         int dayRange = (int) TimeUnit.DAYS.convert(
                 currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
-        Log.d("RX_Test","getDayBefore:" + dayRange);
+        Log.d("RX_Test", "getDayBefore:" + dayRange);
         return dayRange;
     }
 
     public int getDaysAfterCurrent() {
         long currentDayTime = getDayTime(0);
-        long maxDbTime = MainActivity.getDb().transactionDao().getMaxDate();
-        if (maxDbTime < currentDayTime) {
-            return 0;
-        }
-        int dayRange = (int) TimeUnit.DAYS.convert(maxDbTime - currentDayTime, TimeUnit.MILLISECONDS);
-        Log.d("RX_Test","getDayAfter:" + dayRange);
-        return dayRange;
+                long maxDbTime = MainActivity.getDb().transactionDao().getMaxDate();
+                if (maxDbTime < currentDayTime) {
+                    return 0;
+                } else {
+                   int dayRange = (int) TimeUnit.DAYS.convert(maxDbTime - currentDayTime, TimeUnit.MILLISECONDS);
+                    Log.d("RX_Test", "getDayAfter:" + dayRange);
+                    return dayRange;
+                }
     }
 
     public long getDayTime(int dayBefore) {
@@ -106,7 +109,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-
         return calendar.getTimeInMillis();
     }
 }

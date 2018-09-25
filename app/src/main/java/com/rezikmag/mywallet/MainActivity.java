@@ -28,8 +28,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -233,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 mDb.transactionDao().insert(transaction);
             }
         });
-
         mDisposable.add(completable.subscribeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -248,57 +249,61 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
-        final Object lock = new Object();
 
         final long[] minDate = new long[1];
         final long[] maxDate = new long[1];
-        final int[] position = new int[1];
 
-        mDisposable.add(Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-                synchronized (lock) {
-                    Log.d("Tag", "Synchronized block start new Thread");
-                    if (mDb.transactionDao().getTransactionsCount() == 0) {
-                        minDate[0] = minDefaultDate;
-                        maxDate[0] = new Date().getTime();
-                    } else {
-                        long minDbDate = mDb.transactionDao().getMinDate();
-                        long maxDbDate = mDb.transactionDao().getMaxDate();
-                        if (maxDbDate > new Date().getTime()) {
-                            maxDate[0] = maxDbDate;
-                        } else {
-                            maxDate[0] = new Date().getTime();
+        mDisposable.add(
+                Observable.fromCallable(
+                        new Callable<Integer>() {
+                            @Override
+                            public Integer call() throws Exception {
+                                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+                                final int position;
+
+                                Log.d("Tag", "Synchronized block start new Thread");
+                                if (mDb.transactionDao().getTransactionsCount() == 0) {
+                                    minDate[0] = minDefaultDate;
+                                    maxDate[0] = new Date().getTime();
+                                } else {
+                                    long minDbDate = mDb.transactionDao().getMinDate();
+                                    long maxDbDate = mDb.transactionDao().getMaxDate();
+                                    if (maxDbDate > new Date().getTime()) {
+                                        maxDate[0] = maxDbDate;
+                                    } else {
+                                        maxDate[0] = new Date().getTime();
+                                    }
+                                    if (minDbDate < minDefaultDate) {
+                                        minDate[0] = minDbDate;
+                                    } else {
+                                        minDate[0] = minDefaultDate;
+                                    }
+                                }
+                                if ((date < minDate[0]) || (date > maxDate[0])) {
+                                    position = -1;
+                                } else {
+                                    long difference = date - minDate[0];
+                                    position = (int) (difference / (24 * 60 * 60 * 1000));
+                                }
+                                return position;
+                            }
                         }
-                        if (minDbDate < minDefaultDate) {
-                            minDate[0] = minDbDate;
-                        } else {
-                            minDate[0] = minDefaultDate;
-                        }
-                    }
+                ).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Integer>() {
+                            @Override
+                            public void accept(Integer integer) throws Exception {
+                                {
+                                    if (integer == -1) {
+                                        Log.d("Tag", "mindate:" + minDate[0] + "maxDate:" + maxDate[0]);
+                                        showErrorToast();
+                                    } else {
+                                        pager.setCurrentItem(integer);
+                                    }
+                                }
+                            }
+                        }));
 
-                    long difference = date - minDate[0];
-                    position[0] = (int) (difference / (24 * 60 * 60 * 1000));
-                }
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        synchronized (lock) {
-            if ((date < minDate[0]) || (date > maxDate[0])) {
-                Log.d("Tag", "mindate:" + minDate[0] + "maxDate:" + maxDate[0]);
-                showErrorToast();
-                return;
-            }
-            pager.setCurrentItem(position[0]);
-        }
     }
 
     private void showErrorToast() {
@@ -307,53 +312,30 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
     }
 
     private void changeAnotherDateBalance(final long date) {
-        final Object lock = new Object();
-
-        final long[] minDate = new long[1];
-        final long[] maxDate = new long[1];
-        final int[] position = new int[1];
-
-        mDisposable.add(Completable.fromAction(new Action() {
+        mDisposable.add(Observable.fromCallable(new Callable<Integer>() {
             @Override
-            public void run() throws Exception {
+            public Integer call() throws Exception {
+                final long minDate;
+                final int position;
                 long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-                synchronized (lock) {
-                    lock.wait();
-                    long minDbDate = mDb.transactionDao().getMinDate();
-                    long maxDbDate = mDb.transactionDao().getMaxDate();
-                    if (maxDbDate > new Date().getTime()) {
-                        maxDate[0] = maxDbDate;
-                    } else {
-                        maxDate[0] = new Date().getTime();
-                    }
-                    if (minDbDate < minDefaultDate) {
-                        minDate[0] = minDbDate;
-                    } else {
-                        minDate[0] = minDefaultDate;
-                    }
-                    long difference = date - minDate[0];
-                    position[0] = (int) (difference / (24 * 60 * 60 * 1000));
+                long minDbDate = mDb.transactionDao().getMinDate();
+                if (minDbDate < minDefaultDate) {
+                    minDate = minDbDate;
+                } else {
+                    minDate = minDefaultDate;
                 }
+                long difference = date - minDate;
+                position = (int) (difference / (24 * 60 * 60 * 1000));
+                return position;
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        synchronized (lock) {
-            pagerAdapter.notifyDataSetChanged();
-            lock.notify();
-        }
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        synchronized (lock) {
-            pager.setCurrentItem(position[0]);
-        }
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        pagerAdapter.notifyDataSetChanged();
+                        pager.setCurrentItem(integer);
+                    }
+                }));
     }
 }
