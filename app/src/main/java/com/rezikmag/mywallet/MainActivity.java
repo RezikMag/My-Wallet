@@ -23,7 +23,11 @@ import android.widget.Toast;
 import com.rezikmag.mywallet.Database.AppDataBase;
 import com.rezikmag.mywallet.Database.Transaction;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -31,6 +35,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
             }
         });*/
 
+
         // нужно рефакторить? вынести в отдельный метод?
         mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +118,13 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
             }
         });
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        onFinishDialogSetDate(date);
     }
 
     void showDialog(long time) {
@@ -191,7 +204,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         };
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.addDrawerListener(mDrawerToggle);
-
     }
 
     @Override
@@ -209,77 +221,139 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 break;
         }
 
+
         date = data.getLongExtra("time", 0);
         final int amount = data.getIntExtra("amount", 0);
-
         final String finalTransactionType = transactionType;
 
-
-        Completable completable = Completable.fromAction(new Action() {
+        final Completable completable = Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
                 Transaction transaction = new Transaction(amount, date, finalTransactionType);
                 mDb.transactionDao().insert(transaction);
-                Log.d("DB_LOG", "amount: " + transaction.getAmount() +
-                        "date: " + transaction.date + "type: " + transaction.getTransactionType());
             }
         });
 
-       mDisposable.add(completable.subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action() {
-            @Override
-            public void run() throws Exception {
+        mDisposable.add(completable.subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
+//        Log.d("DB_LOG","itemCount"+ pagerAdapter.getCount());
 
-            }
-        }));
-
-        pagerAdapter.notifyDataSetChanged();
-        onFinishDialogSetDate(date);
+        changeAnotherDateBalance(date);
     }
 
     @Override
-    public void onFinishDialogSetDate(long date) {
+    public void onFinishDialogSetDate(final long date) {
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
+        final Object lock = new Object();
 
-        long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+        final long[] minDate = new long[1];
+        final long[] maxDate = new long[1];
+        final int[] position = new int[1];
 
-        long minDate;
-        long maxDate;
-        if (mDb.transactionDao().getTransactionsCount() == 0) {
-            minDate = minDefaultDate;
-            maxDate = new Date().getTime();
-        } else {
-            long minDbDate = mDb.transactionDao().getMinDate();
-            long maxDbDate = mDb.transactionDao().getMaxDate();
-            if (maxDbDate > new Date().getTime()) {
-                maxDate = maxDbDate;
-            } else {
-                maxDate = new Date().getTime();
+        mDisposable.add(Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+                synchronized (lock) {
+                    Log.d("Tag", "Synchronized block start new Thread");
+                    if (mDb.transactionDao().getTransactionsCount() == 0) {
+                        minDate[0] = minDefaultDate;
+                        maxDate[0] = new Date().getTime();
+                    } else {
+                        long minDbDate = mDb.transactionDao().getMinDate();
+                        long maxDbDate = mDb.transactionDao().getMaxDate();
+                        if (maxDbDate > new Date().getTime()) {
+                            maxDate[0] = maxDbDate;
+                        } else {
+                            maxDate[0] = new Date().getTime();
+                        }
+                        if (minDbDate < minDefaultDate) {
+                            minDate[0] = minDbDate;
+                        } else {
+                            minDate[0] = minDefaultDate;
+                        }
+                    }
+
+                    long difference = date - minDate[0];
+                    position[0] = (int) (difference / (24 * 60 * 60 * 1000));
+                }
             }
-            if (minDbDate < minDefaultDate) {
-                minDate = minDbDate;
-            } else {
-                minDate = minDefaultDate;
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        synchronized (lock) {
+            if ((date < minDate[0]) || (date > maxDate[0])) {
+                Log.d("Tag", "mindate:" + minDate[0] + "maxDate:" + maxDate[0]);
+                showErrorToast();
+                return;
             }
+            pager.setCurrentItem(position[0]);
         }
-        Log.d("Tag", "date" + date + " mindate:" + minDate);
-        long difference = date - minDate;
-        if ((date < minDate) || (date > maxDate)) {
-            showErrorToast();
-            return;
-        }
-        int position = (int) (difference / (24 * 60 * 60 * 1000));
-        Log.d("Tag", "diff: " + difference + ",pos: " + position);
-        pager.setCurrentItem(position);
     }
 
-    void showErrorToast() {
+    private void showErrorToast() {
         Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
                 " записей не существует", Toast.LENGTH_LONG).show();
-
     }
 
+    private void changeAnotherDateBalance(final long date) {
+        final Object lock = new Object();
+
+        final long[] minDate = new long[1];
+        final long[] maxDate = new long[1];
+        final int[] position = new int[1];
+
+        mDisposable.add(Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
+                synchronized (lock) {
+                    lock.wait();
+                    long minDbDate = mDb.transactionDao().getMinDate();
+                    long maxDbDate = mDb.transactionDao().getMaxDate();
+                    if (maxDbDate > new Date().getTime()) {
+                        maxDate[0] = maxDbDate;
+                    } else {
+                        maxDate[0] = new Date().getTime();
+                    }
+                    if (minDbDate < minDefaultDate) {
+                        minDate[0] = minDbDate;
+                    } else {
+                        minDate[0] = minDefaultDate;
+                    }
+                    long difference = date - minDate[0];
+                    position[0] = (int) (difference / (24 * 60 * 60 * 1000));
+                }
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        synchronized (lock) {
+            pagerAdapter.notifyDataSetChanged();
+            lock.notify();
+        }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        synchronized (lock) {
+            pager.setCurrentItem(position[0]);
+        }
+    }
 }

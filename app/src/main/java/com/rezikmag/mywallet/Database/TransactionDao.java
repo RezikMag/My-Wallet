@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 @Dao
 public interface TransactionDao {
@@ -26,13 +28,13 @@ public interface TransactionDao {
     Long getMinDate();
 
     @Query("SELECT MAX(date) FROM transactions")
-    long getMaxDate();
+    Long getMaxDate();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Income'")
     int getSumDayIncome(long currentDate);
 
     @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Income'")
-    Flowable<List<Integer>> getAllDayIncome(long currentDate);
+        List<Integer> getAllDayIncome(long currentDate);
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
     int getSumDayExpenses(long currentDate);

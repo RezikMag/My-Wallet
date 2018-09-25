@@ -1,4 +1,4 @@
-package com.rezikmag.mywallet;
+ package com.rezikmag.mywallet;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,11 +16,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.observers.DisposableMaybeObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
@@ -43,57 +48,28 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        final PageFragment fragment = new PageFragment();
+        final long date = getDayTime(position - getDaysBeforeCurrent());
 
-        long date = getDayTime(position - getDaysBeforeCurrent());
+        //set day total expenses
 
-        final Bundle args = new Bundle();
+        Fragment fragment = PageFragment.newInstance(MainActivity.getDb().transactionDao().getSumDayIncome(date),
+                MainActivity.getDb().transactionDao().getSumDayExpenses(date),
+                (ArrayList<Integer>)   MainActivity.getDb().transactionDao().getAllDayIncome(date),
+                (ArrayList<Integer>)      MainActivity.getDb().transactionDao().getAllDayExpenses(date));
+        Log.d("RX_Test","getItem: " + position);
 
-
-        Disposable getDayIncome =
-                MainActivity.getDb().transactionDao().getAllDayIncome(date)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<List<Integer>>() {
-                            @Override
-                            public void accept(List<Integer> integers) throws Exception {
-                               StringBuffer sb = new StringBuffer();
-                                if (integers != null && integers.size() > 0) {
-                                    for (int a : integers) {
-                                        sb.append("+").append(a).append("Rub" +"\n");
-                                    }
-                                    Log.d("DB_LOG", "size" + integers.size());
-                                    fragment.tvListIncome.setText(sb.toString());
-                                }
-                            }
-                        });
-
-        disposable.add(getDayIncome);
-
-        ArrayList<Integer> dayExpenses = (ArrayList<Integer>) MainActivity.getDb()
-                .transactionDao().getAllDayExpenses(date);
-
-
-//        PageFragment.ARGUMENT_TRANSACTION_INCOME, (ArrayList<Integer>) integers);
-        args.putIntegerArrayList(PageFragment.ARGUMENT_TRANSACTION_EXPENSES, dayExpenses);
-
-        int income = MainActivity.getDb().transactionDao().getSumDayIncome(date);
-        int expenses = MainActivity.getDb().transactionDao().getSumDayExpenses(date);
-
-        args.putInt(PageFragment.ARGUMENT_TOTAL_EXPENSES, expenses);
-        args.putInt(PageFragment.ARGUMENT_TOTAL_INCOME, income);
-
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public int getItemPosition(@NonNull Object object) {
+        Log.d("RX_Test","ItemPosition");
         return POSITION_NONE;
     }
 
     @Override
     public int getCount() {
+        Log.d("RX_Test", "ItemCount: "+ (getDaysBeforeCurrent()+ getDaysAfterCurrent()+1));
         return getDaysBeforeCurrent() + getDaysAfterCurrent() + 1;
     }
 
@@ -108,6 +84,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         }
         int dayRange = (int) TimeUnit.DAYS.convert(
                 currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
+        Log.d("RX_Test","getDayBefore:" + dayRange);
         return dayRange;
     }
 
@@ -118,6 +95,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
             return 0;
         }
         int dayRange = (int) TimeUnit.DAYS.convert(maxDbTime - currentDayTime, TimeUnit.MILLISECONDS);
+        Log.d("RX_Test","getDayAfter:" + dayRange);
         return dayRange;
     }
 
