@@ -28,7 +28,7 @@ public interface TransactionDao {
     long getMinDate();
 
     @Query("SELECT MAX(date) FROM transactions")
-    long getMaxDate();
+    Flowable<Long> getMaxDate();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Income'")
     int getSumDayIncome(long currentDate);

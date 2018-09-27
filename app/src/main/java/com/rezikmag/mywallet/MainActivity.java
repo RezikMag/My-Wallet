@@ -222,8 +222,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 transactionType = getString(R.string.income);
                 break;
         }
-
-
         date = data.getLongExtra("time", 0);
         final int amount = data.getIntExtra("amount", 0);
         final String finalTransactionType = transactionType;
@@ -239,19 +237,17 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe());
-//        Log.d("DB_LOG","itemCount"+ pagerAdapter.getCount());
 
-        changeAnotherDateBalance(date);
+//        changeAnotherDateBalance(date);
     }
+
 
     @Override
     public void onFinishDialogSetDate(final long date) {
+/*
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
-
-        final long[] minDate = new long[1];
-        final long[] maxDate = new long[1];
 
         mDisposable.add(
                 Observable.fromCallable(
@@ -260,29 +256,30 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                             public Integer call() throws Exception {
                                 long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
                                 final int position;
-
+                                final long maxDate;
+                                final long minDate;
                                 Log.d("Tag", "Synchronized block start new Thread");
                                 if (mDb.transactionDao().getTransactionsCount() == 0) {
-                                    minDate[0] = minDefaultDate;
-                                    maxDate[0] = new Date().getTime();
+                                    minDate = minDefaultDate;
+                                    maxDate = new Date().getTime();
                                 } else {
                                     long minDbDate = mDb.transactionDao().getMinDate();
                                     long maxDbDate = mDb.transactionDao().getMaxDate();
                                     if (maxDbDate > new Date().getTime()) {
-                                        maxDate[0] = maxDbDate;
+                                        maxDate = maxDbDate;
                                     } else {
-                                        maxDate[0] = new Date().getTime();
+                                        maxDate = new Date().getTime();
                                     }
                                     if (minDbDate < minDefaultDate) {
-                                        minDate[0] = minDbDate;
+                                        minDate = minDbDate;
                                     } else {
-                                        minDate[0] = minDefaultDate;
+                                        minDate = minDefaultDate;
                                     }
                                 }
-                                if ((date < minDate[0]) || (date > maxDate[0])) {
+                                if ((date < minDate) || (date > maxDate)) {
                                     position = -1;
                                 } else {
-                                    long difference = date - minDate[0];
+                                    long difference = date - minDate;
                                     position = (int) (difference / (24 * 60 * 60 * 1000));
                                 }
                                 return position;
@@ -295,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                             public void accept(Integer integer) throws Exception {
                                 {
                                     if (integer == -1) {
-                                        Log.d("Tag", "mindate:" + minDate[0] + "maxDate:" + maxDate[0]);
                                         showErrorToast();
                                     } else {
                                         pager.setCurrentItem(integer);
@@ -305,6 +301,8 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                         }));
 
     }
+*/
+/*
 
     private void showErrorToast() {
         Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
@@ -337,5 +335,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                         pager.setCurrentItem(integer);
                     }
                 }));
-    }
+*/    }
+
 }
