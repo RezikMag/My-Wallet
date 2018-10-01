@@ -26,15 +26,13 @@ public class PageFragment extends Fragment {
         // Required empty public constructor
     }
 
-        public static PageFragment newInstance(int income, int expenses,
-                                               ArrayList<Integer> dayIncomeList, ArrayList<Integer>
-                                               dayExpencesList){
+        public static PageFragment newInstance(int income, int expenses){
         PageFragment fragment = new PageFragment();
         Bundle args =new Bundle();
         args.putInt(ARGUMENT_TOTAL_INCOME,income);
         args.putInt(ARGUMENT_TOTAL_EXPENSES,expenses);
-        args.putIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES,dayExpencesList);
-        args.putIntegerArrayList(ARGUMENT_TRANSACTION_INCOME,dayIncomeList);
+//        args.putIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES,dayExpencesList);
+//        args.putIntegerArrayList(ARGUMENT_TRANSACTION_INCOME,dayIncomeList);
         fragment.setArguments(args);
         return fragment;
         }
@@ -51,11 +49,12 @@ public class PageFragment extends Fragment {
         TextView tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
         tvTotalExpenses.setText("Expenses: " + getArguments().getInt(ARGUMENT_TOTAL_EXPENSES) + " Rub.");
 
-        TextView tvListIncome = view.findViewById(R.id.tv_list_income);
-        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
+//        TextView tvListIncome = view.findViewById(R.id.tv_list_income);
+//        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
 
-        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
+      /*
+       ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
         Log.d("DB_LOG", "listincome: " + listIncome.size());
         ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
 
@@ -75,7 +74,7 @@ public class PageFragment extends Fragment {
             }
             tvListExpenses.setText(expensesList.toString());
         }
-
+*/
         return view;
     }
 

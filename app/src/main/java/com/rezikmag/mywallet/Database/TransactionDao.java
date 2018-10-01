@@ -25,24 +25,24 @@ public interface TransactionDao {
     Flowable<List<Transaction>> getTransactions();
 
     @Query("SELECT MIN(date) FROM transactions")
-    long getMinDate();
+    Flowable<Long> getMinDate();
 
     @Query("SELECT MAX(date) FROM transactions")
     Flowable<Long> getMaxDate();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Income'")
-    int getSumDayIncome(long currentDate);
+    Flowable<Integer> getSumDayIncome(long currentDate);
 
     @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Income'")
-        List<Integer> getAllDayIncome(long currentDate);
+    Flowable<List<Integer>> getAllDayIncome(long currentDate);
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
-    int getSumDayExpenses(long currentDate);
+    Flowable<Integer> getSumDayExpenses(long currentDate);
 
     @Query("SELECT COUNT(*) FROM transactions")
-    int getTransactionsCount();
+    Flowable<Integer> getTransactionsCount();
 
     @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
-    List<Integer> getAllDayExpenses(long currentDate);
+    Flowable<List<Integer>> getAllDayExpenses(long currentDate);
 
 }

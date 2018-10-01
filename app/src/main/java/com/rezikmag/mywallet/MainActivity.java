@@ -13,35 +13,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
-import com.rezikmag.mywallet.Database.Transaction;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
 
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+public class MainActivity extends AppCompatActivity implements MainContract.View, ChooseDateDialogFragment.EditDateListener {
 
-public class MainActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
-
+    MainContract.Presenter presenter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private static AppDataBase mDb;
@@ -51,8 +36,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
 
     long date = new Date().getTime();
 
-    private CompositeDisposable mDisposable;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,58 +43,46 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         pager = (ViewPager) findViewById(R.id.view_pager);
-        Button mAddIncomeButon = findViewById(R.id.btn_add_income);
+        Button mAddIncomeButton = findViewById(R.id.btn_add_income);
         Button mAddExpensesButton = findViewById(R.id.btn_add_expenses);
         Button mDateChooseButton = findViewById(R.id.btn_nav_date_chose);
 
         mDb = AppDataBase.getInstance(getApplicationContext());
 
+        pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
+
+        presenter = new MainPresenter(this, mDb.transactionDao());
+        presenter.geItemBefore();
+        presenter.getItemAfter();
+
         configureNavigationDrawer();
         configureToolbar();
 
-        mDisposable = new CompositeDisposable();
-
-        pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(pagerAdapter.getDaysBeforeCurrent());
-/*
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-//                Log.d(TAG, "onPageSelected, position = " + position);
-            }
+        presenter.getFragmentData(date);
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset,
-                                       int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });*/
-
-
-        // нужно рефакторить? вынести в отдельный метод?
-        mAddIncomeButon.setOnClickListener(new View.OnClickListener() {
+        pager.setCurrentItem(pagerAdapter.getMinDate());
+        pagerAdapter.notifyDataSetChanged();
+        mAddIncomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
-                        - pagerAdapter.getDaysBeforeCurrent()));
+                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
-
+/*
         mAddExpensesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
                 intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
-                        - pagerAdapter.getDaysBeforeCurrent()));
+                        - pagerAdapter.getMinDate()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
+
+ */
 
         mDateChooseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,11 +93,10 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
 
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
-//        onFinishDialogSetDate(date);
+
     }
 
     void showDialog(long time) {
@@ -136,9 +106,6 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
         newFragment.show(fm, "dialog from nav");
     }
 
-    public static AppDataBase getDb() {
-        return mDb;
-    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -210,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null) {
+       /* if (data == null) {
             return;
         }
         String transactionType = "";
@@ -238,7 +205,8 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe());
 
-//        changeAnotherDateBalance(date);
+        changeAnotherDateBalance(date);
+*/
     }
 
 
@@ -254,33 +222,23 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                         new Callable<Integer>() {
                             @Override
                             public Integer call() throws Exception {
-                                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-                                final int position;
-                                final long maxDate;
-                                final long minDate;
+                                int position;
+                                int maxDate = 0;
+                                int minDate = MyPagerAdapter.MIN_DAYS_NUMBER;
                                 Log.d("Tag", "Synchronized block start new Thread");
-                                if (mDb.transactionDao().getTransactionsCount() == 0) {
-                                    minDate = minDefaultDate;
-                                    maxDate = new Date().getTime();
-                                } else {
-                                    long minDbDate = mDb.transactionDao().getMinDate();
-                                    long maxDbDate = mDb.transactionDao().getMaxDate();
-                                    if (maxDbDate > new Date().getTime()) {
-                                        maxDate = maxDbDate;
-                                    } else {
-                                        maxDate = new Date().getTime();
-                                    }
-                                    if (minDbDate < minDefaultDate) {
-                                        minDate = minDbDate;
-                                    } else {
-                                        minDate = minDefaultDate;
-                                    }
+
+                                long currentDate = new Date().getTime();
+                                if (pagerAdapter.getMaxDate() > 0) {
+                                    maxDate = pagerAdapter.getMaxDate();
                                 }
-                                if ((date < minDate) || (date > maxDate)) {
+                                if (minDate < pagerAdapter.getMinDate()) {
+                                    minDate = pagerAdapter.getMinDate();
+                                }
+
+                                int position1 = (int) ((date - currentDate) / (24 * 60 * 60 * 1000));
+                                position = minDate + position1;
+                                if ((position < 0) || (position > maxDate + minDate)) {
                                     position = -1;
-                                } else {
-                                    long difference = date - minDate;
-                                    position = (int) (difference / (24 * 60 * 60 * 1000));
                                 }
                                 return position;
                             }
@@ -299,30 +257,30 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                                 }
                             }
                         }));
-
+  */
     }
-*/
-/*
+
 
     private void showErrorToast() {
         Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
                 " записей не существует", Toast.LENGTH_LONG).show();
     }
 
-    private void changeAnotherDateBalance(final long date) {
+    private void changeAnotherDateBalance(final long time) {
+    /*
         mDisposable.add(Observable.fromCallable(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 final long minDate;
                 final int position;
                 long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-                long minDbDate = mDb.transactionDao().getMinDate();
-                if (minDbDate < minDefaultDate) {
-                    minDate = minDbDate;
+
+                if (pagerAdapter.getMinDate() < minDefaultDate) {
+                    minDate = pagerAdapter.getMinDate();
                 } else {
                     minDate = minDefaultDate;
                 }
-                long difference = date - minDate;
+                long difference = time - minDate;
                 position = (int) (difference / (24 * 60 * 60 * 1000));
                 return position;
             }
@@ -335,6 +293,25 @@ public class MainActivity extends AppCompatActivity implements ChooseDateDialogF
                         pager.setCurrentItem(integer);
                     }
                 }));
-*/    }
+    */
+    }
 
+    @Override
+    public void setDayAfter(Integer daysAfter) {
+        pagerAdapter.setMaxDate(daysAfter);
+        pagerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void setDayBefore(Integer daysBefore) {
+        pagerAdapter.setMinDate(daysBefore);
+        pagerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void setCurrentFragmentData(int totalIncome, int totalExpenses) {
+        pagerAdapter.setBalance(totalIncome, totalExpenses);
+        pagerAdapter.notifyDataSetChanged();
+    }
 }
+
