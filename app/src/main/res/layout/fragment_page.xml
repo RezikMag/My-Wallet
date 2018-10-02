@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context="com.rezikmag.mywallet.MainActivity">
+
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout1"
-    android:layout_margin="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -20,41 +30,20 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="income" />
 
-    <TextView
-        android:id="@+id/tv_list_income"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:gravity="center"
-        android:textColor="@android:color/holo_green_dark"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/tv_total_income"
-        app:layout_constraintStart_toStartOf="@+id/tv_total_income"
-        app:layout_constraintTop_toBottomOf="@+id/tv_total_income"
-        tools:text="500rub." />
 
     <TextView
         android:id="@+id/tv_total_expenses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:gravity="center"
+        android:padding="8dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        app:layout_constraintEnd_toEndOf="@+id/tv_list_income"
-        app:layout_constraintStart_toStartOf="@+id/tv_list_income"
-        app:layout_constraintTop_toBottomOf="@+id/tv_list_income"
+        app:layout_constraintEnd_toEndOf="@+id/tv_total_income"
+        app:layout_constraintStart_toStartOf="@+id/tv_total_income"
+        app:layout_constraintTop_toBottomOf="@+id/tv_total_income"
         tools:text="Expenses" />
 
-    <TextView
-        android:id="@+id/tv_list_expenses"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:gravity="center"
-        android:textColor="@android:color/holo_red_dark"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/tv_total_expenses"
-        app:layout_constraintStart_toStartOf="@+id/tv_total_expenses"
-        app:layout_constraintTop_toBottomOf="@+id/tv_total_expenses"
-        tools:text="-200rub." />
 </android.support.constraint.ConstraintLayout>
+
+    <include layout="@layout/bottom_sheet"/>
+</android.support.design.widget.CoordinatorLayout>

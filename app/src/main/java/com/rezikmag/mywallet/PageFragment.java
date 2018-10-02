@@ -1,8 +1,10 @@
 package com.rezikmag.mywallet;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,10 +56,16 @@ public class PageFragment extends Fragment {
         TextView tvListIncome = view.findViewById(R.id.tv_list_income);
         TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
+        TextView tvBalance = view.findViewById(R.id.tv_balance);
 
+        int balance = getArguments().getInt(ARGUMENT_TOTAL_INCOME) -
+                getArguments().getInt(ARGUMENT_TOTAL_EXPENSES);
+        tvBalance.setText("Balance: " + balance + " Rub.");
+        if (balance<0){
+            tvBalance.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.colorRed));
+        }
 
        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
-//        Log.d("DB_LOG", "listincome: " + listIncome.size());
         ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
 
         StringBuilder incomeList = new StringBuilder();

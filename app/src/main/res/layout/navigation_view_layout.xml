@@ -6,7 +6,7 @@
     <Button
         android:layout_margin="8dp"
         android:background="@drawable/shape_button_rect"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="@string/day"/>
@@ -14,7 +14,7 @@
     <Button
         android:layout_margin="8dp"
         android:background="@drawable/shape_button_rect"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="@string/week"/>
@@ -22,12 +22,12 @@
     <Button
         android:background="@drawable/shape_button_rect"
         android:layout_margin="8dp"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:text="@string/mounth"/>
     <Button
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -36,7 +36,7 @@
     <Button
         android:id="@+id/btn_nav_date_chose"
         android:layout_margin="8dp"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/choose_date"
