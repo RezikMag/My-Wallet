@@ -13,6 +13,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View, ChooseDateDialogFragment.EditDateListener {
+    private static final String TAG = "MainActivity";
 
     MainContract.Presenter presenter;
     private DrawerLayout mDrawerLayout;
@@ -58,31 +61,48 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         configureNavigationDrawer();
         configureToolbar();
 
+        Log.d(TAG, "page:" + pager.getCurrentItem());
         pager.setAdapter(pagerAdapter);
-        presenter.getFragmentData(date);
 
-        pager.setCurrentItem(pagerAdapter.getMinDate());
-        pagerAdapter.notifyDataSetChanged();
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                presenter.getFragmentData(pagerAdapter.getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
+                Log.d(TAG, "item: " + pager.getCurrentItem());
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         mAddIncomeButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter.getPageTitle(pager.getCurrentItem()));
+                intent.putExtra("showDate", pagerAdapter
+                        .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
-/*
+
         mAddExpensesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter.getDayTime(pager.getCurrentItem()
-                        - pagerAdapter.getMinDate()));
+                intent.putExtra("showDate", pagerAdapter
+                        .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
-
- */
 
         mDateChooseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,13 +110,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 showDialog(date);
             }
         });
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
+//        pager.setCurrentItem(pagerAdapter.getMinDate());
+//        presenter.getFragmentData(pagerAdapter.getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
     }
 
     void showDialog(long time) {
@@ -177,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       /* if (data == null) {
+        if (data == null) {
             return;
         }
         String transactionType = "";
@@ -190,74 +210,35 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 break;
         }
         date = data.getLongExtra("time", 0);
-        final int amount = data.getIntExtra("amount", 0);
-        final String finalTransactionType = transactionType;
+        int amount = data.getIntExtra("amount", 0);
 
-        final Completable completable = Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                Transaction transaction = new Transaction(amount, date, finalTransactionType);
-                mDb.transactionDao().insert(transaction);
-            }
-        });
-        mDisposable.add(completable.subscribeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-
+        presenter.addTransaction(amount, date, transactionType);
+        pagerAdapter.notifyDataSetChanged();
         changeAnotherDateBalance(date);
-*/
+
     }
 
-
     @Override
-    public void onFinishDialogSetDate(final long date) {
-/*
+    public void onFinishDialogSetDate(long date) {
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
 
-        mDisposable.add(
-                Observable.fromCallable(
-                        new Callable<Integer>() {
-                            @Override
-                            public Integer call() throws Exception {
-                                int position;
-                                int maxDate = 0;
-                                int minDate = MyPagerAdapter.MIN_DAYS_NUMBER;
-                                Log.d("Tag", "Synchronized block start new Thread");
+        int position;
+        int maxDate = pagerAdapter.getMaxDate();
+        int minDate = pagerAdapter.getMinDate();
+        long currentDate = new Date().getTime();
 
-                                long currentDate = new Date().getTime();
-                                if (pagerAdapter.getMaxDate() > 0) {
-                                    maxDate = pagerAdapter.getMaxDate();
-                                }
-                                if (minDate < pagerAdapter.getMinDate()) {
-                                    minDate = pagerAdapter.getMinDate();
-                                }
-
-                                int position1 = (int) ((date - currentDate) / (24 * 60 * 60 * 1000));
-                                position = minDate + position1;
-                                if ((position < 0) || (position > maxDate + minDate)) {
-                                    position = -1;
-                                }
-                                return position;
-                            }
-                        }
-                ).subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<Integer>() {
-                            @Override
-                            public void accept(Integer integer) throws Exception {
-                                {
-                                    if (integer == -1) {
-                                        showErrorToast();
-                                    } else {
-                                        pager.setCurrentItem(integer);
-                                    }
-                                }
-                            }
-                        }));
-  */
+        int position1 = (int) ((date - currentDate) / (24 * 60 * 60 * 1000));
+        position = minDate + position1;
+        if ((position < 0) || (position > maxDate + minDate)) {
+            position = -1;
+        }
+        if (position == -1) {
+            showErrorToast();
+        } else {
+            pager.setCurrentItem(position);
+        }
     }
 
 
@@ -296,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     */
     }
 
+
     @Override
     public void setDayAfter(Integer daysAfter) {
         pagerAdapter.setMaxDate(daysAfter);
@@ -309,8 +291,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     @Override
-    public void setCurrentFragmentData(int totalIncome, int totalExpenses) {
-        pagerAdapter.setBalance(totalIncome, totalExpenses);
+    public void setCurrentFragmentData(int totalIncome, List<Integer> listIncome,
+                                       int totalExpenses, List<Integer> listExpenses) {
+        pagerAdapter.setBalance(totalIncome, (ArrayList<Integer>) listIncome,
+                totalExpenses, (ArrayList<Integer>) listExpenses);
         pagerAdapter.notifyDataSetChanged();
     }
 }

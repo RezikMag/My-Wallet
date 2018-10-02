@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -26,13 +27,14 @@ public class PageFragment extends Fragment {
         // Required empty public constructor
     }
 
-        public static PageFragment newInstance(int income, int expenses){
+        public static PageFragment newInstance(int income, ArrayList<Integer> dayIncomeList,
+                                               int expenses, ArrayList<Integer> dayExpencesList){
         PageFragment fragment = new PageFragment();
         Bundle args =new Bundle();
         args.putInt(ARGUMENT_TOTAL_INCOME,income);
         args.putInt(ARGUMENT_TOTAL_EXPENSES,expenses);
-//        args.putIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES,dayExpencesList);
-//        args.putIntegerArrayList(ARGUMENT_TRANSACTION_INCOME,dayIncomeList);
+        args.putIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES,dayExpencesList);
+        args.putIntegerArrayList(ARGUMENT_TRANSACTION_INCOME,dayIncomeList);
         fragment.setArguments(args);
         return fragment;
         }
@@ -49,24 +51,23 @@ public class PageFragment extends Fragment {
         TextView tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
         tvTotalExpenses.setText("Expenses: " + getArguments().getInt(ARGUMENT_TOTAL_EXPENSES) + " Rub.");
 
-//        TextView tvListIncome = view.findViewById(R.id.tv_list_income);
-//        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
+        TextView tvListIncome = view.findViewById(R.id.tv_list_income);
+        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
 
-      /*
+
        ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
-        Log.d("DB_LOG", "listincome: " + listIncome.size());
+//        Log.d("DB_LOG", "listincome: " + listIncome.size());
         ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
 
-        StringBuffer incomeList = new StringBuffer();
+        StringBuilder incomeList = new StringBuilder();
         if (listIncome != null && listIncome.size() > 0) {
             for (int a : listIncome) {
                 incomeList.append("+").append(a).append(getString(R.string.rub) + "\n");
             }
             tvListIncome.setText(incomeList.toString());
         }
-
-        StringBuffer expensesList = new StringBuffer();
+        StringBuilder expensesList = new StringBuilder();
 
         if (listExpenses!=null && listExpenses.size()>0) {
             for (int a : listExpenses) {
@@ -74,7 +75,6 @@ public class PageFragment extends Fragment {
             }
             tvListExpenses.setText(expensesList.toString());
         }
-*/
         return view;
     }
 

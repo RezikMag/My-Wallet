@@ -17,7 +17,6 @@ public abstract class AppDataBase extends RoomDatabase {
             synchronized (LOCK) {
                 instance = Room.databaseBuilder(context.getApplicationContext(),
                         AppDataBase.class, AppDataBase.DATABASE_NAME)
-                        .allowMainThreadQueries()
                         .build();
             }
         }

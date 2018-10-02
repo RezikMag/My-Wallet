@@ -8,7 +8,8 @@ public interface MainContract {
         void setDayAfter(Integer daysAfter);
         void setDayBefore(Integer daysBefore);
 
-    void setCurrentFragmentData(int totalIncome, int totalExpenses);
+    void setCurrentFragmentData(int totalIncome, List<Integer> list,
+                                int totalExpenses, List<Integer> list2);
     }
 
     interface Presenter{

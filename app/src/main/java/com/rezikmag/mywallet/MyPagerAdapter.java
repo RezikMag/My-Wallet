@@ -7,18 +7,21 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     private int maxDate;
     private int minDate;
+    private ArrayList<Integer> listIncomes;
     private int totalIncome;
     private int totalExpenses;
-
+    private ArrayList<Integer> listExpenses;
 
     @Override
     public CharSequence getPageTitle(int position) {
@@ -35,14 +38,15 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-     Fragment fragment = PageFragment.newInstance(totalIncome, totalExpenses);
+        long time = getDayTime(position - getMinDate());
+
+        Fragment fragment = PageFragment.newInstance(totalIncome, listIncomes,totalExpenses,listExpenses);
         return fragment;
     }
 
     @Override
     public int getItemPosition(@NonNull Object object) {
         return POSITION_NONE;
-
     }
 
     @Override
@@ -51,10 +55,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         return getMinDate() + getMaxDate() + 1;
     }
 
-
-    private void setFragment(Fragment fragment) {
-//        this.fragment = fragment;
-    }
 
     public void setMaxDate(int max) {
         maxDate = max;
@@ -72,7 +72,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         this.minDate = minDate;
     }
 
-    private long getDayTime(int dayBefore) {
+    public long getDayTime(int dayBefore) {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, dayBefore);
         calendar.set(Calendar.HOUR, 0);
@@ -82,9 +82,12 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         return calendar.getTimeInMillis();
     }
 
-    public void setBalance(int totalIncome, int totalExpences) {
+    public void setBalance(int totalIncome,ArrayList<Integer> listIncomes, int totalExpenses,
+                           ArrayList<Integer> listExpenses) {
         this.totalIncome = totalIncome;
-        this.totalExpenses = totalExpences;
+        this.listIncomes = listIncomes;
+        this.totalExpenses = totalExpenses;
+        this.listExpenses = listExpenses;
     }
 }
 

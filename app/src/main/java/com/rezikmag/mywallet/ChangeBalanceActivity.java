@@ -36,8 +36,8 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         mAddAmount = (EditText) findViewById(R.id.edit_change_balance);
 
         Intent intent = getIntent();
-        String time = intent.getStringExtra("showDate");
-        mDateButton.setText(time);
+        time = intent.getLongExtra("showDate",0);
+        setDate(time);
 
 //        String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
         mOkButton = (Button) findViewById(R.id.ok_button);
@@ -55,7 +55,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
                 String amount = mAddAmount.getText().toString();
                 Intent backIntent = new Intent();
                 backIntent.putExtra("amount", Integer.parseInt(amount));
-//                backIntent.putExtra("time", time);
+                backIntent.putExtra("time", time);
                 setResult(RESULT_OK, backIntent);
                 finish();
             }

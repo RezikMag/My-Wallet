@@ -31,13 +31,13 @@ public interface TransactionDao {
     Flowable<Long> getMaxDate();
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Income'")
-    Flowable<Integer> getSumDayIncome(long currentDate);
+    Flowable<List<Integer>> getSumDayIncome(long currentDate);
 
     @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Income'")
     Flowable<List<Integer>> getAllDayIncome(long currentDate);
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
-    Flowable<Integer> getSumDayExpenses(long currentDate);
+    Flowable<List<Integer>> getSumDayExpenses(long currentDate);
 
     @Query("SELECT COUNT(*) FROM transactions")
     Flowable<Integer> getTransactionsCount();

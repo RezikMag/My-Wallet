@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
@@ -19,6 +20,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Function4;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainPresenter implements MainContract.Presenter {
@@ -41,23 +43,43 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void getFragmentData(long date) {
         mDisposable.add(Flowable.combineLatest(transactionDao.getSumDayIncome(date),
-                transactionDao.getSumDayExpenses(date), new BiFunction<Integer, Integer, List<Integer>>() {
+                transactionDao.getAllDayIncome(date), transactionDao.getSumDayExpenses(date)
+                , transactionDao.getAllDayExpenses(date), new Function4<List<Integer>, List<Integer>,
+                        List<Integer>, List<Integer>, List<List<Integer>>>() {
                     @Override
-                    public List<Integer> apply(Integer integer, Integer integer2) throws Exception {
-                    List<Integer> list = new ArrayList<>();
-                    list.add(integer);
-                    list.add(integer2);
-                        return list;
+                    public List<List<Integer>> apply(List<Integer> list, List<Integer> list2,
+                                                     List<Integer> list3, List<Integer> list4) throws Exception {
+
+                        List<List<Integer>> lists = new ArrayList<>();
+                        lists.add(list);
+                        lists.add(list2);
+                        lists.add(list3);
+                        lists.add(list4);
+                        return lists;
                     }
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<Integer>>() {
+                .subscribe(new Consumer<List<List<Integer>>>() {
                     @Override
-                    public void accept(List<Integer> integers) throws Exception {
-                        int totalIncome = integers.get(0);
-                        int totalExpenses = integers.get(1);
-                        mView.setCurrentFragmentData(totalIncome, totalExpenses);
-                    }
+                    public void accept(List<List<Integer>> integers) throws Exception {
+                            Log.d(TAG, "income: " + integers);
+                            List<Integer> income = integers.get(0);
+                            int incomeValue;
+                            if (income.get(0)==null){
+                                incomeValue = 0;
+                            }else{
+                            incomeValue = income.get(0);
+                            }
+                            List<Integer> expenses = integers.get(2);
+                            int expensesValue;
+                            if (expenses.get(0)==null){
+                                expensesValue = 0;
+                            } else {
+                                expensesValue = expenses.get(0);
+                            }
+                            mView.setCurrentFragmentData(incomeValue,integers.get(1),expensesValue,integers.get(3));
+                         }
                 }));
     }
 
@@ -83,12 +105,12 @@ public class MainPresenter implements MainContract.Presenter {
                             @Override
                             public void accept(Integer daysBefore) throws Exception {
                                 mView.setDayBefore(daysBefore);
-                                Log.d("RX_test", "set data through the onCreate");
+                                Log.d("RX_test", "dayBefore:" + daysBefore );
                             }
                         }, new Consumer<Throwable>() {
                             @Override
                             public void accept(Throwable throwable) throws Exception {
-                                Log.d("RX_test", "set data through the onCreate");
+                                Log.d("RX_test", "throwable:" + throwable.getMessage());
                             }
                         })
         );
@@ -115,11 +137,12 @@ public class MainPresenter implements MainContract.Presenter {
                     public void accept(Integer maxRange) throws Exception {
                         mView.setDayAfter(maxRange);
                         Log.d("RX_Test", "getDayAfter:" + maxRange);
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-
+                        Log.d(TAG, "Throwable:" + throwable.getMessage());
                     }
                 }));
     }
@@ -137,7 +160,7 @@ public class MainPresenter implements MainContract.Presenter {
                 .subscribe());
     }
 
-    private long getDayTime(int dayBefore) {
+    public long getDayTime(int dayBefore) {
         Calendar calendar = new GregorianCalendar();
         calendar.add(Calendar.DAY_OF_YEAR, dayBefore);
         calendar.set(Calendar.HOUR, 0);
