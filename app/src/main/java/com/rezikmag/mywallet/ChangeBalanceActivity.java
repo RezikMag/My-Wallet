@@ -45,7 +45,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                showDialog(time);
+                showDialog(time);
             }
         });
 

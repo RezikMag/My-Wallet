@@ -1,5 +1,6 @@
 package com.rezikmag.mywallet;
 
+import android.nfc.Tag;
 import android.util.Log;
 
 import com.rezikmag.mywallet.Database.Transaction;
@@ -91,6 +92,7 @@ public class MainPresenter implements MainContract.Presenter {
                         final int dayRange;
                         long currentDayTime =getDayTime(0);
                         long minShowTime = getDayTime(-MIN_DAYS_NUMBER);
+                        Log.d(TAG, "MinDate: "+ min);
                         if (min < minShowTime && min != 0) {
                             minShowTime = min;
                         }

@@ -223,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
             mDrawerLayout.closeDrawers();
         }
-
         int position;
         int maxDate = pagerAdapter.getMaxDate();
         int minDate = pagerAdapter.getMinDate();
@@ -247,34 +246,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 " записей не существует", Toast.LENGTH_LONG).show();
     }
 
-    private void changeAnotherDateBalance(final long time) {
-    /*
-        mDisposable.add(Observable.fromCallable(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                final long minDate;
-                final int position;
-                long minDefaultDate = pagerAdapter.getDayTime(-MyPagerAdapter.MIN_DAYS_NUMBER);
-
-                if (pagerAdapter.getMinDate() < minDefaultDate) {
-                    minDate = pagerAdapter.getMinDate();
-                } else {
-                    minDate = minDefaultDate;
-                }
-                long difference = time - minDate;
-                position = (int) (difference / (24 * 60 * 60 * 1000));
-                return position;
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer integer) throws Exception {
-                        pagerAdapter.notifyDataSetChanged();
-                        pager.setCurrentItem(integer);
-                    }
-                }));
-    */
+    private void changeAnotherDateBalance(long time) {
+        int minDate = pagerAdapter.getMinDate();
+        long currentDate = pagerAdapter.getDayTime(0);
+        int position1 = (int) ((time - currentDate) / (24 * 60 * 60 * 1000));
+        int position = minDate + position1;
+        pager.setCurrentItem(position);
+        pagerAdapter.notifyDataSetChanged();
     }
 
 
