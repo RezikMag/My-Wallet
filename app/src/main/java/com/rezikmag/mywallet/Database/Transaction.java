@@ -21,18 +21,22 @@ public class Transaction {
 
     public long date;
 
-    public Transaction(long id, int amount, long date, String transactionType) {
+    public String category;
+
+    public Transaction(long id, int amount, long date, String transactionType, String category) {
         this.id = id;
         this.amount = amount;
         this.date = date;
         this.transactionType=transactionType;
+        this.category = category;
     }
 
     @Ignore
-    public Transaction(int amount, long date, String transactionType) {
+    public Transaction(int amount, long date, String transactionType, String category) {
         this.amount = amount;
         this.date = date;
         this.transactionType=transactionType;
+        this.category= category;
     }
 
     @NonNull
@@ -50,5 +54,9 @@ public class Transaction {
 
     public long getDate() {
         return date;
+    }
+
+    public String getCategory() {
+        return category;
     }
 }

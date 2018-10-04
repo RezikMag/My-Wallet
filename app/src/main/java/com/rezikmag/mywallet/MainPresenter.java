@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
@@ -21,7 +20,6 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Function4;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainPresenter implements MainContract.Presenter {
@@ -41,48 +39,6 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
 
-    @Override
-    public void getFragmentData(long date) {
-        mDisposable.add(Flowable.combineLatest(transactionDao.getSumDayIncome(date),
-                transactionDao.getAllDayIncome(date), transactionDao.getSumDayExpenses(date)
-                , transactionDao.getAllDayExpenses(date), new Function4<List<Integer>, List<Integer>,
-                        List<Integer>, List<Integer>, List<List<Integer>>>() {
-                    @Override
-                    public List<List<Integer>> apply(List<Integer> list, List<Integer> list2,
-                                                     List<Integer> list3, List<Integer> list4) throws Exception {
-
-                        List<List<Integer>> lists = new ArrayList<>();
-                        lists.add(list);
-                        lists.add(list2);
-                        lists.add(list3);
-                        lists.add(list4);
-                        return lists;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<List<Integer>>>() {
-                    @Override
-                    public void accept(List<List<Integer>> integers) throws Exception {
-                            Log.d(TAG, "income: " + integers);
-                            List<Integer> income = integers.get(0);
-                            int incomeValue;
-                            if (income.get(0)==null){
-                                incomeValue = 0;
-                            }else{
-                            incomeValue = income.get(0);
-                            }
-                            List<Integer> expenses = integers.get(2);
-                            int expensesValue;
-                            if (expenses.get(0)==null){
-                                expensesValue = 0;
-                            } else {
-                                expensesValue = expenses.get(0);
-                            }
-                            mView.setCurrentFragmentData(incomeValue,integers.get(1),expensesValue,integers.get(3));
-                         }
-                }));
-    }
 
     @Override
     public void geItemBefore() {
@@ -150,11 +106,11 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void addTransaction(final int amount, final long date, final String type) {
+    public void addTransaction(final int amount, final long date, final String type, final String category) {
          mDisposable.add(Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
-                Transaction transaction = new Transaction(amount, date, type);
+                Transaction transaction = new Transaction(amount, date, type, category);
                 transactionDao.insert(transaction);
             }
         }).observeOn(AndroidSchedulers.mainThread())

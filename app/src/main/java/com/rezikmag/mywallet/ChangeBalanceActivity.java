@@ -17,6 +17,9 @@ import java.util.Date;
 
 public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDateDialogFragment.EditDateListener {
 
+    public static final String AMOUNT = "amount";
+    public static final String CATEGORY = "category";
+    public static final String DATE = "showDate";
     public static final String TRANSACTION_TYPE = "transactionType";
     public static final int ADD_INCOME_BUTTON_CODE = 1234;
     public static final int ADD_EXPENSES_BUTTON_CODE = 1334;
@@ -36,12 +39,16 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         mAddAmount = (EditText) findViewById(R.id.edit_change_balance);
 
         Intent intent = getIntent();
-        time = intent.getLongExtra("showDate",0);
+        time = intent.getLongExtra(DATE,0);
         setDate(time);
+        final String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
+        final String category = intent.getStringExtra(CATEGORY);
 
-//        String transactionType = intent.getStringExtra(TRANSACTION_TYPE);
         mOkButton = (Button) findViewById(R.id.ok_button);
 
+        if(category!=null){
+            mOkButton.setText("add '" +category + "'");
+        }
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,10 +59,15 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
         mOkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mAddAmount.getText().toString().isEmpty()){
+                    return;
+                }
                 String amount = mAddAmount.getText().toString();
                 Intent backIntent = new Intent();
-                backIntent.putExtra("amount", Integer.parseInt(amount));
-                backIntent.putExtra("time", time);
+                backIntent.putExtra(AMOUNT, Integer.parseInt(amount));
+                backIntent.putExtra(DATE, time);
+                backIntent.putExtra(TRANSACTION_TYPE,transactionType);
+                backIntent.putExtra(CATEGORY,category);
                 setResult(RESULT_OK, backIntent);
                 finish();
             }

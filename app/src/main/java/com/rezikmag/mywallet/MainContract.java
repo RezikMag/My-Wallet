@@ -1,5 +1,7 @@
 package com.rezikmag.mywallet;
 
+import com.rezikmag.mywallet.Database.Transaction;
+
 import java.util.List;
 
 public interface MainContract {
@@ -8,18 +10,13 @@ public interface MainContract {
         void setDayAfter(Integer daysAfter);
         void setDayBefore(Integer daysBefore);
 
-    void setCurrentFragmentData(int totalIncome, List<Integer> list,
-                                int totalExpenses, List<Integer> list2);
-    }
+            }
 
     interface Presenter{
-        void addTransaction(int amount, long date, String type);
-        void getFragmentData(long date);
+        void addTransaction(int amount, long date, String type, String category);
         void geItemBefore();
         void getItemAfter();
     }
 
-    interface Repository{
 
-    }
 }

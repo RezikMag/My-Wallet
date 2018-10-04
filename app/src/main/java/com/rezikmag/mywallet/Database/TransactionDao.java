@@ -33,8 +33,8 @@ public interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Income'")
     Flowable<List<Integer>> getSumDayIncome(long currentDate);
 
-    @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Income'")
-    Flowable<List<Integer>> getAllDayIncome(long currentDate);
+    @Query("SELECT * FROM transactions WHERE date=:currentDate AND transactionType='Income'")
+    Flowable<List<Transaction>> getAllDayIncome(long currentDate);
 
     @Query("SELECT SUM(amount) FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
     Flowable<List<Integer>> getSumDayExpenses(long currentDate);
@@ -42,7 +42,7 @@ public interface TransactionDao {
     @Query("SELECT COUNT(*) FROM transactions")
     Flowable<Integer> getTransactionsCount();
 
-    @Query("SELECT amount FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
-    Flowable<List<Integer>> getAllDayExpenses(long currentDate);
+    @Query("SELECT * FROM transactions WHERE date=:currentDate AND transactionType='Expenses'")
+    Flowable<List<Transaction>> getAllDayExpenses(long currentDate);
 
 }

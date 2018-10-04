@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
+import com.rezikmag.mywallet.Database.Transaction;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,10 +20,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     private int maxDate;
     private int minDate;
-    private ArrayList<Integer> listIncomes;
-    private int totalIncome;
-    private int totalExpenses;
-    private ArrayList<Integer> listExpenses;
 
     @Override
     public CharSequence getPageTitle(int position) {
@@ -40,7 +38,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         long time = getDayTime(position - getMinDate());
 
-        Fragment fragment = PageFragment.newInstance(totalIncome, listIncomes,totalExpenses,listExpenses);
+        Fragment fragment = PageFragment.newInstance(time);
         return fragment;
     }
 
@@ -82,12 +80,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         return calendar.getTimeInMillis();
     }
 
-    public void setBalance(int totalIncome,ArrayList<Integer> listIncomes, int totalExpenses,
-                           ArrayList<Integer> listExpenses) {
-        this.totalIncome = totalIncome;
-        this.listIncomes = listIncomes;
-        this.totalExpenses = totalExpenses;
-        this.listExpenses = listExpenses;
-    }
+
 }
 

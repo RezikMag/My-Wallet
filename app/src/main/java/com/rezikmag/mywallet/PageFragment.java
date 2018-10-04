@@ -1,45 +1,50 @@
 package com.rezikmag.mywallet;
 
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.rezikmag.mywallet.Database.Transaction;
+
 import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PageFragment extends Fragment {
+public class PageFragment extends Fragment implements PagerFpagmentContract.View {
 
-    static final String ARGUMENT_TOTAL_INCOME = "income";
-    static final String ARGUMENT_TRANSACTION_INCOME = "transaction income";
-    static final String ARGUMENT_TOTAL_EXPENSES = "expenses";
-    static final String ARGUMENT_TRANSACTION_EXPENSES = "transaction expenses";
+    static final String ARGUMENT_TIME = "time";
+
+    PagerFpagmentContract.Presenter presenter;
+    TextView tvTotalIncome;
+    TextView tvTotalExpenses;
+    TextView tvListIncome;
+    TextView tvListExpenses;
+    Button btnBalance;
+
+    long date;
 
     public PageFragment() {
         // Required empty public constructor
     }
 
-        public static PageFragment newInstance(int income, ArrayList<Integer> dayIncomeList,
-                                               int expenses, ArrayList<Integer> dayExpencesList){
+    public static PageFragment newInstance(long time) {
         PageFragment fragment = new PageFragment();
-        Bundle args =new Bundle();
-        args.putInt(ARGUMENT_TOTAL_INCOME,income);
-        args.putInt(ARGUMENT_TOTAL_EXPENSES,expenses);
-        args.putIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES,dayExpencesList);
-        args.putIntegerArrayList(ARGUMENT_TRANSACTION_INCOME,dayIncomeList);
+        Bundle args = new Bundle();
+        args.putLong(ARGUMENT_TIME, time);
         fragment.setArguments(args);
         return fragment;
-        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,43 +52,81 @@ public class PageFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_page, container, false);
 
-        TextView tvTotalIncome = view.findViewById(R.id.tv_total_income);
-        tvTotalIncome.setText("Income: " + getArguments().getInt(ARGUMENT_TOTAL_INCOME) + " Rub.");
+        date = getArguments().getLong(ARGUMENT_TIME, 0);
 
-        TextView tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
-        tvTotalExpenses.setText("Expenses: " + getArguments().getInt(ARGUMENT_TOTAL_EXPENSES) + " Rub.");
+        btnBalance = view.findViewById(R.id.btn_balance);
 
-        TextView tvListIncome = view.findViewById(R.id.tv_list_income);
-        TextView tvListExpenses = view.findViewById(R.id.tv_list_expenses);
+        tvTotalIncome = view.findViewById(R.id.tv_total_income);
+        tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
+         tvListIncome = view.findViewById(R.id.tv_list_income);
+         tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
-        TextView tvBalance = view.findViewById(R.id.tv_balance);
+        presenter = new FragmentPresenter(this, MainActivity.mDb.transactionDao());
 
-        int balance = getArguments().getInt(ARGUMENT_TOTAL_INCOME) -
-                getArguments().getInt(ARGUMENT_TOTAL_EXPENSES);
-        tvBalance.setText("Balance: " + balance + " Rub.");
-        if (balance<0){
-            tvBalance.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.colorRed));
-        }
 
-       ArrayList<Integer> listIncome = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_INCOME);
-        ArrayList<Integer> listExpenses = getArguments().getIntegerArrayList(ARGUMENT_TRANSACTION_EXPENSES);
-
-        StringBuilder incomeList = new StringBuilder();
-        if (listIncome != null && listIncome.size() > 0) {
-            for (int a : listIncome) {
-                incomeList.append("+").append(a).append(getString(R.string.rub) + "\n");
+        final LinearLayout bottomSheet = view.findViewById(R.id.bottom_sheet);
+        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        btnBalance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                } else {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
             }
-            tvListIncome.setText(incomeList.toString());
-        }
-        StringBuilder expensesList = new StringBuilder();
+        });
 
-        if (listExpenses!=null && listExpenses.size()>0) {
-            for (int a : listExpenses) {
-                expensesList.append("-").append(a).append(getString(R.string.rub) + "\n");
+        Button btnSportExpenses = view.findViewById(R.id.btn_sport);
+        btnSportExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(),ChangeBalanceActivity.class);
+                intent.putExtra(ChangeBalanceActivity.DATE,date);
+                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.expenses));
+                intent.putExtra("category", getString(R.string.sport));
+                getActivity().startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
-            tvListExpenses.setText(expensesList.toString());
-        }
+        });
+
+        presenter.getTransactions(date);
+        presenter.getIncomeAndExpenses(date);
+
         return view;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        presenter.onDetach();
+    }
+
+    @Override
+    public void setIncomeAndExpenses(int totalIncome, int totalExpenses) {
+        tvTotalIncome.setText(totalIncome + " Rub.");
+        tvTotalExpenses.setText(totalExpenses + " Rub.");
+        int balance = totalIncome - totalExpenses;
+        btnBalance.setText("Balance: " + balance + " Rub.");
+        if (balance < 0) {
+            btnBalance.setBackgroundColor(getResources().getColor( R.color.colorRed));
+        }
+    }
+
+    @Override
+    public void setTransactionsList(List<Transaction> listIncome, List<Transaction> listExpenses) {
+        StringBuilder builder = new StringBuilder();
+        for(Transaction t : listIncome ){
+               int amount = t.getAmount();
+               String category = t.getCategory();
+               builder.append("+" +  amount + getString(R.string.rub)+ category + "\n");
+            }
+          tvListIncome.setText(builder);
+        StringBuilder builder2 = new StringBuilder();
+        for(Transaction t : listExpenses ){
+            int amount = t.getAmount();
+            String category = t.getCategory();
+            builder2.append("-" + amount + getString(R.string.rub)+ category + "\n");
+        }
+        tvListExpenses.setText(builder2);
+    }
 }

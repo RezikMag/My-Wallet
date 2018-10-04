@@ -21,10 +21,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity implements MainContract.View, ChooseDateDialogFragment.EditDateListener {
     private static final String TAG = "MainActivity";
@@ -32,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     MainContract.Presenter presenter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private static AppDataBase mDb;
+    static AppDataBase mDb;
 
     private ViewPager pager;
     private MyPagerAdapter pagerAdapter;
@@ -61,35 +59,18 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         configureNavigationDrawer();
         configureToolbar();
 
-        Log.d(TAG, "page:" + pager.getCurrentItem());
         pager.setAdapter(pagerAdapter);
 
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                presenter.getFragmentData(pagerAdapter.getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
-                Log.d(TAG, "item: " + pager.getCurrentItem());
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         mAddIncomeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter
+                intent.putExtra(ChangeBalanceActivity.DATE, pagerAdapter
                         .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
+
+                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.income));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
             }
         });
@@ -98,8 +79,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra("showDate", pagerAdapter
+                intent.putExtra(ChangeBalanceActivity.DATE, pagerAdapter
                         .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
+                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.expenses));
                 startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
             }
         });
@@ -200,7 +182,8 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         if (data == null) {
             return;
         }
-        String transactionType = "";
+        String transactionType = data.getStringExtra(ChangeBalanceActivity.TRANSACTION_TYPE);
+        /*
         switch (requestCode) {
             case ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE:
                 transactionType = getString(R.string.expenses);
@@ -208,14 +191,15 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             case ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE:
                 transactionType = getString(R.string.income);
                 break;
-        }
-        date = data.getLongExtra("time", 0);
-        int amount = data.getIntExtra("amount", 0);
+        }*/
 
-        presenter.addTransaction(amount, date, transactionType);
+        String category = data.getStringExtra(ChangeBalanceActivity.CATEGORY);
+        date = data.getLongExtra(ChangeBalanceActivity.DATE, 0);
+        int amount = data.getIntExtra(ChangeBalanceActivity.AMOUNT, 0);
+
+        presenter.addTransaction(amount, date, transactionType,category);
         pagerAdapter.notifyDataSetChanged();
         changeAnotherDateBalance(date);
-
     }
 
     @Override
@@ -239,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             pager.setCurrentItem(position);
         }
     }
-
 
     private void showErrorToast() {
         Toast.makeText(getApplicationContext(), "Невозможно перейти на выбранную дату." +
@@ -268,12 +251,5 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         pagerAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void setCurrentFragmentData(int totalIncome, List<Integer> listIncome,
-                                       int totalExpenses, List<Integer> listExpenses) {
-        pagerAdapter.setBalance(totalIncome, (ArrayList<Integer>) listIncome,
-                totalExpenses, (ArrayList<Integer>) listExpenses);
-        pagerAdapter.notifyDataSetChanged();
-    }
 }
 

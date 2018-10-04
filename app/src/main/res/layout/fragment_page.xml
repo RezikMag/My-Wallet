@@ -8,42 +8,192 @@
     tools:context="com.rezikmag.mywallet.MainActivity">
 
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/layout1"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/tv_total_income"
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/layout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="income" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_total_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_green_dark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="income" />
 
 
-    <TextView
-        android:id="@+id/tv_total_expenses"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="8dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        app:layout_constraintEnd_toEndOf="@+id/tv_total_income"
-        app:layout_constraintStart_toStartOf="@+id/tv_total_income"
-        app:layout_constraintTop_toBottomOf="@+id/tv_total_income"
-        tools:text="Expenses" />
+        <Button
+            android:id="@+id/btn_cafe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="Cafe"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_fun"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_clothes" />
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/btn_fun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Fun"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_cafe"
+            app:layout_constraintEnd_toStartOf="@+id/btn_pets"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_cafe"
+            app:layout_constraintTop_toTopOf="@+id/btn_cafe"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <Button
+            android:id="@+id/btn_hygiene"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="Hygiene"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_pets"
+            app:layout_constraintTop_toBottomOf="@+id/btn_phone" />
+
+        <Button
+            android:id="@+id/btn_pets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pets"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_fun"
+            app:layout_constraintEnd_toStartOf="@+id/btn_hygiene"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_fun"
+            app:layout_constraintTop_toTopOf="@+id/btn_fun" />
+
+        <Button
+            android:id="@+id/btn_transport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
+            android:text="Transport"
+            app:layout_constraintBottom_toTopOf="@+id/btn_phone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/tv_total_income"
+            app:layout_constraintTop_toBottomOf="@+id/btn_home" />
+
+        <Button
+            android:id="@+id/btn_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:text="phone"
+            app:layout_constraintBottom_toTopOf="@+id/btn_hygiene"
+            app:layout_constraintEnd_toEndOf="@+id/btn_transport"
+            app:layout_constraintStart_toStartOf="@+id/btn_transport"
+            app:layout_constraintTop_toBottomOf="@+id/btn_transport" />
+
+        <Button
+            android:id="@+id/btn_car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="Car"
+            app:layout_constraintBottom_toTopOf="@+id/btn_clothes"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/eat" />
+
+        <Button
+            android:id="@+id/btn_clothes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Clothes"
+            app:layout_constraintBottom_toTopOf="@+id/btn_cafe"
+            app:layout_constraintEnd_toEndOf="@+id/btn_car"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/btn_car"
+            app:layout_constraintTop_toBottomOf="@+id/btn_car" />
+
+        <Button
+            android:id="@+id/btn_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Home"
+            app:layout_constraintBottom_toTopOf="@+id/btn_transport"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_sport"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.82" />
+
+        <Button
+            android:id="@+id/btn_sport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sport"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_home"
+            app:layout_constraintEnd_toStartOf="@+id/btn_home"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_health"
+            app:layout_constraintTop_toTopOf="@+id/btn_home" />
+
+        <Button
+            android:id="@+id/btn_health"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Health"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_sport"
+            app:layout_constraintEnd_toStartOf="@+id/btn_sport"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/eat"
+            app:layout_constraintTop_toTopOf="@+id/btn_sport"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/tv_total_expenses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@android:color/holo_red_dark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/tv_total_income"
+            app:layout_constraintStart_toStartOf="@+id/tv_total_income"
+            app:layout_constraintTop_toBottomOf="@+id/tv_total_income"
+            app:layout_constraintVertical_bias="0.056"
+            tools:text="Expenses" />
+
+        <Button
+            android:id="@+id/eat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="eat"
+            app:layout_constraintBottom_toTopOf="@+id/btn_car"
+            app:layout_constraintEnd_toStartOf="@+id/btn_health"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <include layout="@layout/bottom_sheet"/>
+
 </android.support.design.widget.CoordinatorLayout>
