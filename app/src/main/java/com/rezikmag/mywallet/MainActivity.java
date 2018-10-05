@@ -13,7 +13,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,23 +65,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra(ChangeBalanceActivity.DATE, pagerAdapter
-                        .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
-
-                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.income));
-                startActivityForResult(intent, ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE);
+                startForResult(getString(R.string.income));
             }
         });
 
         mAddExpensesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ChangeBalanceActivity.class);
-                intent.putExtra(ChangeBalanceActivity.DATE, pagerAdapter
-                        .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
-                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.expenses));
-                startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
+                startForResult(getString(R.string.expenses));
             }
         });
 
@@ -98,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     protected void onStart() {
         super.onStart();
 //        pager.setCurrentItem(pagerAdapter.getMinDate());
-//        presenter.getFragmentData(pagerAdapter.getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
     }
 
     void showDialog(long time) {
@@ -183,15 +172,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             return;
         }
         String transactionType = data.getStringExtra(ChangeBalanceActivity.TRANSACTION_TYPE);
-        /*
-        switch (requestCode) {
-            case ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE:
-                transactionType = getString(R.string.expenses);
-                break;
-            case ChangeBalanceActivity.ADD_INCOME_BUTTON_CODE:
-                transactionType = getString(R.string.income);
-                break;
-        }*/
 
         String category = data.getStringExtra(ChangeBalanceActivity.CATEGORY);
         date = data.getLongExtra(ChangeBalanceActivity.DATE, 0);
@@ -202,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         changeAnotherDateBalance(date);
     }
 
+    //choose date button logic
     @Override
     public void onFinishDialogSetDate(long date) {
         if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
@@ -229,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 " записей не существует", Toast.LENGTH_LONG).show();
     }
 
+    //show last add notes date
     private void changeAnotherDateBalance(long time) {
         int minDate = pagerAdapter.getMinDate();
         long currentDate = pagerAdapter.getDayTime(0);
@@ -245,11 +227,20 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         pagerAdapter.notifyDataSetChanged();
     }
 
+
     @Override
     public void setDayBefore(Integer daysBefore) {
         pagerAdapter.setMinDate(daysBefore);
         pagerAdapter.notifyDataSetChanged();
     }
 
+    //start activity for change balance
+    private void startForResult( String transactionType ){
+        Intent intent = new Intent(getApplicationContext(), ChangeBalanceActivity.class);
+        intent.putExtra(ChangeBalanceActivity.DATE,pagerAdapter
+                .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
+        intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, transactionType);
+        startActivityForResult(intent, ChangeBalanceActivity.ADD_CODE);
+    }
 }
 

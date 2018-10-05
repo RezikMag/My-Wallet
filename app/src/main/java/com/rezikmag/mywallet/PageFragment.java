@@ -1,22 +1,20 @@
 package com.rezikmag.mywallet;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rezikmag.mywallet.Database.Transaction;
 
 import java.util.List;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,18 +49,15 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_page, container, false);
-
         date = getArguments().getLong(ARGUMENT_TIME, 0);
-
         btnBalance = view.findViewById(R.id.btn_balance);
 
         tvTotalIncome = view.findViewById(R.id.tv_total_income);
         tvTotalExpenses = view.findViewById(R.id.tv_total_expenses);
-         tvListIncome = view.findViewById(R.id.tv_list_income);
-         tvListExpenses = view.findViewById(R.id.tv_list_expenses);
+        tvListIncome = view.findViewById(R.id.tv_list_income);
+        tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
         presenter = new FragmentPresenter(this, MainActivity.mDb.transactionDao());
-
 
         final LinearLayout bottomSheet = view.findViewById(R.id.bottom_sheet);
         final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
@@ -77,17 +72,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
             }
         });
 
-        Button btnSportExpenses = view.findViewById(R.id.btn_sport);
-        btnSportExpenses.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),ChangeBalanceActivity.class);
-                intent.putExtra(ChangeBalanceActivity.DATE,date);
-                intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE,getString(R.string.expenses));
-                intent.putExtra("category", getString(R.string.sport));
-                getActivity().startActivityForResult(intent, ChangeBalanceActivity.ADD_EXPENSES_BUTTON_CODE);
-            }
-        });
+        initButtons(view);
 
         presenter.getTransactions(date);
         presenter.getIncomeAndExpenses(date);
@@ -108,25 +93,134 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         int balance = totalIncome - totalExpenses;
         btnBalance.setText("Balance: " + balance + " Rub.");
         if (balance < 0) {
-            btnBalance.setBackgroundColor(getResources().getColor( R.color.colorRed));
+            btnBalance.setBackgroundColor(getResources().getColor(R.color.colorRed));
         }
     }
 
     @Override
     public void setTransactionsList(List<Transaction> listIncome, List<Transaction> listExpenses) {
         StringBuilder builder = new StringBuilder();
-        for(Transaction t : listIncome ){
-               int amount = t.getAmount();
-               String category = t.getCategory();
-               builder.append("+" +  amount + getString(R.string.rub)+ category + "\n");
-            }
-          tvListIncome.setText(builder);
-        StringBuilder builder2 = new StringBuilder();
-        for(Transaction t : listExpenses ){
+        for (Transaction t : listIncome) {
             int amount = t.getAmount();
             String category = t.getCategory();
-            builder2.append("-" + amount + getString(R.string.rub)+ category + "\n");
+            builder.append("+" + amount + getString(R.string.rub) + category + "\n");
+        }
+        tvListIncome.setText(builder);
+        StringBuilder builder2 = new StringBuilder();
+        for (Transaction t : listExpenses) {
+            int amount = t.getAmount();
+            String category = t.getCategory();
+            builder2.append("-" + amount + getString(R.string.rub) + category + "\n");
         }
         tvListExpenses.setText(builder2);
+    }
+
+    private void startForResult(String category) {
+        Intent intent = new Intent(getActivity(), ChangeBalanceActivity.class);
+        intent.putExtra(ChangeBalanceActivity.DATE, date);
+        intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, getString(R.string.expenses));
+        intent.putExtra(ChangeBalanceActivity.CATEGORY, category);
+        getActivity().startActivityForResult(intent, ChangeBalanceActivity.ADD_CODE);
+    }
+
+    public void initButtons(View view) {
+        ImageButton btnSportExpenses = view.findViewById(R.id.btn_sport);
+        btnSportExpenses.setOnClickListener(new View.OnClickListener() { 
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.sport));
+            }
+        });
+
+        ImageButton btnEatExpenses = view.findViewById(R.id.btn_eat);
+        btnEatExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.eat));
+            }
+        });
+
+
+        ImageButton btnTransportExpenses = view.findViewById(R.id.btn_transport);
+        btnTransportExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.transport));
+            }
+        });
+
+        ImageButton btnCarExpenses = view.findViewById(R.id.btn_car);
+        btnCarExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.car));
+            }
+        });
+
+        ImageButton btnClothesExpenses = view.findViewById(R.id.btn_clothes);
+        btnClothesExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.clothes));
+            }
+        });
+
+        ImageButton btnHealthExpenses = view.findViewById(R.id.btn_health);
+        btnHealthExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.health));
+            }
+        });
+
+        ImageButton btnHomeExpenses = view.findViewById(R.id.btn_home);
+        btnHomeExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.home));
+            }
+        });
+
+        ImageButton btnPhoneExpenses = view.findViewById(R.id.btn_phone);
+        btnPhoneExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.phone));
+            }
+        });
+
+        ImageButton btnCafeExpenses = view.findViewById(R.id.btn_cafe);
+        btnCafeExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.cafe));
+            }
+        });
+
+        ImageButton btnFunExpenses = view.findViewById(R.id.btn_fun);
+        btnFunExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.fun));
+            }
+        });
+
+        ImageButton btnPetsExpenses = view.findViewById(R.id.btn_pets);
+        btnPetsExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.pets));
+            }
+        });
+
+        ImageButton btnHygieneExpenses = view.findViewById(R.id.btn_hygiene);
+        btnHygieneExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startForResult(getString(R.string.hygiene));
+            }
+        });
+
+
     }
 }

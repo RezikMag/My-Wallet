@@ -1,5 +1,6 @@
 package com.rezikmag.mywallet;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -21,8 +22,7 @@ public class ChangeBalanceActivity extends AppCompatActivity implements ChooseDa
     public static final String CATEGORY = "category";
     public static final String DATE = "showDate";
     public static final String TRANSACTION_TYPE = "transactionType";
-    public static final int ADD_INCOME_BUTTON_CODE = 1234;
-    public static final int ADD_EXPENSES_BUTTON_CODE = 1334;
+    public static final int ADD_CODE = 1334;
 
     EditText mAddAmount;
     TextView mDateButton;

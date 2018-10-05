@@ -22,119 +22,138 @@
             android:id="@+id/tv_total_income"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="52dp"
             android:gravity="center"
             android:padding="8dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/holo_green_dark"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintHorizontal_bias="0.467"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_sport"
             tools:text="income" />
 
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_cafe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:text="Cafe"
+            android:background="@android:color/white"
+            android:src="@drawable/restourant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_fun"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_clothes" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_fun"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Fun"
+            android:background="@android:color/white"
+            android:src="@drawable/drinks"
             app:layout_constraintBottom_toBottomOf="@+id/btn_cafe"
             app:layout_constraintEnd_toStartOf="@+id/btn_pets"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btn_cafe"
             app:layout_constraintTop_toTopOf="@+id/btn_cafe"
             app:layout_constraintVertical_bias="1.0" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_hygiene"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:text="Hygiene"
+            android:src="@drawable/hygiene"
+            android:background="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btn_pets"
             app:layout_constraintTop_toBottomOf="@+id/btn_phone" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_pets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:src="@drawable/pets"
             android:text="Pets"
+
             app:layout_constraintBottom_toBottomOf="@+id/btn_fun"
             app:layout_constraintEnd_toStartOf="@+id/btn_hygiene"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btn_fun"
-            app:layout_constraintTop_toTopOf="@+id/btn_fun" />
+            app:layout_constraintTop_toTopOf="@+id/btn_fun"
+            app:layout_constraintVertical_bias="1.0" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_transport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="8dp"
+            android:background="@android:color/white"
+            android:src="@drawable/transport"
+
             android:text="Transport"
             app:layout_constraintBottom_toTopOf="@+id/btn_phone"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/btn_home"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/tv_total_income"
+            app:layout_constraintStart_toStartOf="@+id/btn_home"
             app:layout_constraintTop_toBottomOf="@+id/btn_home" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:text="phone"
+            android:src="@drawable/phone"
+            android:background="@android:color/white"
+
             app:layout_constraintBottom_toTopOf="@+id/btn_hygiene"
             app:layout_constraintEnd_toEndOf="@+id/btn_transport"
             app:layout_constraintStart_toStartOf="@+id/btn_transport"
             app:layout_constraintTop_toBottomOf="@+id/btn_transport" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_car"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="36dp"
+            android:background="@android:color/white"
+            android:src="@drawable/car"
             android:text="Car"
+
             app:layout_constraintBottom_toTopOf="@+id/btn_clothes"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/eat" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_eat" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_clothes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:background="@android:color/white"
+            android:src="@drawable/clothes"
             android:text="Clothes"
+
             app:layout_constraintBottom_toTopOf="@+id/btn_cafe"
             app:layout_constraintEnd_toEndOf="@+id/btn_car"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/btn_car"
             app:layout_constraintTop_toBottomOf="@+id/btn_car" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:background="@android:color/white"
+            android:src="@drawable/home"
             android:text="Home"
+
             app:layout_constraintBottom_toTopOf="@+id/btn_transport"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -142,26 +161,32 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.82" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_sport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/sport"
             android:text="sport"
+            android:background="@android:color/white"
+
             app:layout_constraintBottom_toBottomOf="@+id/btn_home"
             app:layout_constraintEnd_toStartOf="@+id/btn_home"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btn_health"
             app:layout_constraintTop_toTopOf="@+id/btn_home" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_health"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/health"
             android:text="Health"
+            android:background="@android:color/white"
+
             app:layout_constraintBottom_toBottomOf="@+id/btn_sport"
             app:layout_constraintEnd_toStartOf="@+id/btn_sport"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/eat"
+            app:layout_constraintStart_toEndOf="@+id/btn_eat"
             app:layout_constraintTop_toTopOf="@+id/btn_sport"
             app:layout_constraintVertical_bias="1.0" />
 
@@ -169,23 +194,24 @@
             android:id="@+id/tv_total_expenses"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
             android:padding="8dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@android:color/holo_red_dark"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btn_pets"
             app:layout_constraintEnd_toEndOf="@+id/tv_total_income"
             app:layout_constraintStart_toStartOf="@+id/tv_total_income"
             app:layout_constraintTop_toBottomOf="@+id/tv_total_income"
-            app:layout_constraintVertical_bias="0.056"
             tools:text="Expenses" />
 
-        <Button
-            android:id="@+id/eat"
+        <ImageButton
+            android:id="@+id/btn_eat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="eat"
+            android:background="@android:color/white"
+            android:src="@drawable/bread"
             app:layout_constraintBottom_toTopOf="@+id/btn_car"
             app:layout_constraintEnd_toStartOf="@+id/btn_health"
             app:layout_constraintHorizontal_bias="0.5"
@@ -194,6 +220,6 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <include layout="@layout/bottom_sheet"/>
+    <include layout="@layout/bottom_sheet" />
 
 </android.support.design.widget.CoordinatorLayout>
