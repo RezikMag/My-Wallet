@@ -1,4 +1,4 @@
-package com.rezikmag.mywallet;
+package com.rezikmag.mywallet.UI;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -6,20 +6,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import com.rezikmag.mywallet.Database.Transaction;
+import com.rezikmag.mywallet.UI.PageFragment;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 
 public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
     private int maxDate;
     private int minDate;
+
 
     @Override
     public CharSequence getPageTitle(int position) {
@@ -37,7 +36,6 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         long time = getDayTime(position - getMinDate());
-
         Fragment fragment = PageFragment.newInstance(time);
         return fragment;
     }
@@ -52,6 +50,7 @@ public class MyPagerAdapter extends FragmentStatePagerAdapter {
         Log.d("RX_Test", "ItemCount: " + (getMinDate() + getMaxDate() + 1));
         return getMinDate() + getMaxDate() + 1;
     }
+
 
 
     public void setMaxDate(int max) {

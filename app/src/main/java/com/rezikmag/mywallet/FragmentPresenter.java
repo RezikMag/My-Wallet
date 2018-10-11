@@ -31,7 +31,6 @@ public class FragmentPresenter implements PagerFpagmentContract.Presenter {
 
     @Override
     public void getIncomeAndExpenses(long date) {
-        Log.d(TAG, "method getIncomeAndExpenses started.");
         mDisposable.add(Flowable.combineLatest(transactionDao.getSumDayIncome(date),
                 transactionDao.getSumDayExpenses(date), new BiFunction<List<Integer>,List <Integer>, List<Integer>>() {
                     @Override
@@ -69,7 +68,6 @@ public class FragmentPresenter implements PagerFpagmentContract.Presenter {
                         List<List<Transaction>>>() {
                     @Override
                     public List<List<Transaction>> apply(List<Transaction> list, List<Transaction> list2) throws Exception {
-
                         List<List<Transaction>> lists = new ArrayList<>();
                         lists.add(list);
                         lists.add(list2);
@@ -87,8 +85,6 @@ public class FragmentPresenter implements PagerFpagmentContract.Presenter {
                         mView.setTransactionsList(income,expenses);
                     }
                 }));
-
-
     }
 
     @Override

@@ -1,7 +1,8 @@
-package com.rezikmag.mywallet;
+package com.rezikmag.mywallet.UI;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,16 +13,22 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.rezikmag.mywallet.Database.AppDataBase;
 import com.rezikmag.mywallet.Database.Transaction;
+import com.rezikmag.mywallet.FragmentPresenter;
+import com.rezikmag.mywallet.PagerFpagmentContract;
+import com.rezikmag.mywallet.R;
 
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class PageFragment extends Fragment implements PagerFpagmentContract.View {
 
     static final String ARGUMENT_TIME = "time";
+    private static final String ARGUMENT_STATE ="state" ;
 
     PagerFpagmentContract.Presenter presenter;
     TextView tvTotalIncome;
@@ -29,9 +36,11 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
     TextView tvListIncome;
     TextView tvListExpenses;
     Button btnBalance;
-
+    BottomSheetBehavior bottomSheetBehavior;
     long date;
 
+
+//тест
     public PageFragment() {
         // Required empty public constructor
     }
@@ -44,12 +53,14 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         return fragment;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_page, container, false);
+
         date = getArguments().getLong(ARGUMENT_TIME, 0);
+
         btnBalance = view.findViewById(R.id.btn_balance);
 
         tvTotalIncome = view.findViewById(R.id.tv_total_income);
@@ -57,10 +68,11 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         tvListIncome = view.findViewById(R.id.tv_list_income);
         tvListExpenses = view.findViewById(R.id.tv_list_expenses);
 
-        presenter = new FragmentPresenter(this, MainActivity.mDb.transactionDao());
+        presenter = new FragmentPresenter(this, AppDataBase.getInstance(getContext()).transactionDao());
 
-        final LinearLayout bottomSheet = view.findViewById(R.id.bottom_sheet);
-        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        LinearLayout bottomSheet = view.findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior  = BottomSheetBehavior.from(bottomSheet);
+
         btnBalance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,19 +85,19 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         });
 
         initButtons(view);
-
         presenter.getTransactions(date);
         presenter.getIncomeAndExpenses(date);
-
         return view;
     }
 
+    //отцепить слушателей
     @Override
     public void onDetach() {
         super.onDetach();
         presenter.onDetach();
     }
 
+    //полные расходы и доходы
     @Override
     public void setIncomeAndExpenses(int totalIncome, int totalExpenses) {
         tvTotalIncome.setText(totalIncome + " Rub.");
@@ -97,6 +109,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         }
     }
 
+    //заполнение списка расходов и доходов
     @Override
     public void setTransactionsList(List<Transaction> listIncome, List<Transaction> listExpenses) {
         StringBuilder builder = new StringBuilder();
@@ -106,6 +119,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
             builder.append("+" + amount + getString(R.string.rub) + category + "\n");
         }
         tvListIncome.setText(builder);
+
         StringBuilder builder2 = new StringBuilder();
         for (Transaction t : listExpenses) {
             int amount = t.getAmount();
@@ -115,6 +129,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         tvListExpenses.setText(builder2);
     }
 
+    //запуск активити для заполнения расходов
     private void startForResult(String category) {
         Intent intent = new Intent(getActivity(), ChangeBalanceActivity.class);
         intent.putExtra(ChangeBalanceActivity.DATE, date);
@@ -123,7 +138,10 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         getActivity().startActivityForResult(intent, ChangeBalanceActivity.ADD_CODE);
     }
 
+    // кнопки для добавления расходов
     public void initButtons(View view) {
+
+
         ImageButton btnSportExpenses = view.findViewById(R.id.btn_sport);
         btnSportExpenses.setOnClickListener(new View.OnClickListener() { 
             @Override
@@ -220,7 +238,5 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
                 startForResult(getString(R.string.hygiene));
             }
         });
-
-
     }
 }

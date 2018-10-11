@@ -29,16 +29,12 @@ public class MainPresenter implements MainContract.Presenter {
 
     TransactionDao transactionDao;
     CompositeDisposable mDisposable =new CompositeDisposable();
-
     MainContract.View mView;;
 
     public MainPresenter(MainContract.View mView, TransactionDao transactionDao) {
         this.mView = mView;
         this.transactionDao = transactionDao;
-
     }
-
-
 
     @Override
     public void geItemBefore() {
@@ -54,7 +50,6 @@ public class MainPresenter implements MainContract.Presenter {
                         }
                         dayRange = (int) TimeUnit.DAYS.convert(
                                 currentDayTime - minShowTime, TimeUnit.MILLISECONDS);
-                        Log.d("RX_Test", "getDayBefore:" + dayRange);
                         return dayRange;
                     }
                 }).observeOn(AndroidSchedulers.mainThread())
@@ -63,7 +58,7 @@ public class MainPresenter implements MainContract.Presenter {
                             @Override
                             public void accept(Integer daysBefore) throws Exception {
                                 mView.setDayBefore(daysBefore);
-                                Log.d("RX_test", "dayBefore:" + daysBefore );
+
                             }
                         }, new Consumer<Throwable>() {
                             @Override

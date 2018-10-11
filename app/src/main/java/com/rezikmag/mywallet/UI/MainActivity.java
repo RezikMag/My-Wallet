@@ -1,4 +1,4 @@
-package com.rezikmag.mywallet;
+package com.rezikmag.mywallet.UI;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -20,16 +20,20 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
+import com.rezikmag.mywallet.MainContract;
+import com.rezikmag.mywallet.MainPresenter;
+import com.rezikmag.mywallet.R;
+
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity implements MainContract.View, ChooseDateDialogFragment.EditDateListener {
+public class MainActivity extends AppCompatActivity implements MainContract.View, ChooseDateDialogFragment.EditDateListener{
     private static final String TAG = "MainActivity";
 
     MainContract.Presenter presenter;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    static AppDataBase mDb;
+    AppDataBase mDb;
 
     private ViewPager pager;
     private MyPagerAdapter pagerAdapter;
@@ -242,5 +246,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, transactionType);
         startActivityForResult(intent, ChangeBalanceActivity.ADD_CODE);
     }
+
 }
 

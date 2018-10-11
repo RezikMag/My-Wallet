@@ -1,4 +1,4 @@
-package com.rezikmag.mywallet;
+package com.rezikmag.mywallet.UI;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+
+import com.rezikmag.mywallet.R;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
