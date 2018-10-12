@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         configureToolbar();
 
         pager.setAdapter(pagerAdapter);
-
+        pager.setOffscreenPageLimit(1);
 
         mAddIncomeButton.setOnClickListener(new View.OnClickListener() {
 
@@ -84,6 +84,23 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
             @Override
             public void onClick(View v) {
                 showDialog(date);
+            }
+        });
+
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
     }
@@ -181,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         date = data.getLongExtra(ChangeBalanceActivity.DATE, 0);
         int amount = data.getIntExtra(ChangeBalanceActivity.AMOUNT, 0);
 
-        presenter.addTransaction(amount, date, transactionType,category);
+        presenter.addTransaction(amount, date, transactionType, category);
         pagerAdapter.notifyDataSetChanged();
         changeAnotherDateBalance(date);
     }
@@ -239,13 +256,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     }
 
     //start activity for change balance
-    private void startForResult( String transactionType ){
+    private void startForResult(String transactionType) {
         Intent intent = new Intent(getApplicationContext(), ChangeBalanceActivity.class);
-        intent.putExtra(ChangeBalanceActivity.DATE,pagerAdapter
+        intent.putExtra(ChangeBalanceActivity.DATE, pagerAdapter
                 .getDayTime(pager.getCurrentItem() - pagerAdapter.getMinDate()));
         intent.putExtra(ChangeBalanceActivity.TRANSACTION_TYPE, transactionType);
         startActivityForResult(intent, ChangeBalanceActivity.ADD_CODE);
     }
-
 }
 

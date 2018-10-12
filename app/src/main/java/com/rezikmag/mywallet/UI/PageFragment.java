@@ -12,23 +12,27 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rezikmag.mywallet.Database.AppDataBase;
 import com.rezikmag.mywallet.Database.Transaction;
 import com.rezikmag.mywallet.FragmentPresenter;
+import com.rezikmag.mywallet.MessageEvent;
 import com.rezikmag.mywallet.PagerFpagmentContract;
 import com.rezikmag.mywallet.R;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-
 public class PageFragment extends Fragment implements PagerFpagmentContract.View {
 
     static final String ARGUMENT_TIME = "time";
-    private static final String ARGUMENT_STATE ="state" ;
 
     PagerFpagmentContract.Presenter presenter;
     TextView tvTotalIncome;
@@ -36,11 +40,11 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
     TextView tvListIncome;
     TextView tvListExpenses;
     Button btnBalance;
-    BottomSheetBehavior bottomSheetBehavior;
+
     long date;
+    BottomSheetBehavior bottomSheetBehavior;
 
-
-//тест
+    //тест
     public PageFragment() {
         // Required empty public constructor
     }
@@ -52,7 +56,6 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +74,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
         presenter = new FragmentPresenter(this, AppDataBase.getInstance(getContext()).transactionDao());
 
         LinearLayout bottomSheet = view.findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior  = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
         btnBalance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,10 +87,41 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
             }
         });
 
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState ==BottomSheetBehavior.STATE_COLLAPSED ||
+                        newState == BottomSheetBehavior.STATE_EXPANDED )
+                    EventBus.getDefault().post(new MessageEvent(newState));
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
         initButtons(view);
         presenter.getTransactions(date);
         presenter.getIncomeAndExpenses(date);
         return view;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    void  onMessageEvent(MessageEvent event){
+        bottomSheetBehavior.setState(event.message);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     //отцепить слушателей
@@ -143,7 +177,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
 
 
         ImageButton btnSportExpenses = view.findViewById(R.id.btn_sport);
-        btnSportExpenses.setOnClickListener(new View.OnClickListener() { 
+        btnSportExpenses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startForResult(getString(R.string.sport));
@@ -238,5 +272,7 @@ public class PageFragment extends Fragment implements PagerFpagmentContract.View
                 startForResult(getString(R.string.hygiene));
             }
         });
+
+
     }
 }
